@@ -1,6 +1,6 @@
 {
   "name": "@spawner/nodejs-sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node.js SDK to integrate with Spawner API.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,14 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yakatav/spawner-node-sdk.git"
+    "url": "git@github.com:yakatav/spawner-node-sdk.git"
   },
   "author": "Warps,Inc.",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/yakatav/spawner-node-sdk/issues"
-  },
-  "homepage": "https://www.spawnerai.com/",
   "dependencies": {
     "@bufbuild/buf": "^1.34.0",
     "@bufbuild/protobuf": "^1.10.0",
