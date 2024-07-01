@@ -1,12 +1,18 @@
 import type { WritableIterable } from "@connectrpc/connect/protocol";
 import { FeatureConfiguration } from "../../proto/spawner/main/v1/main_pb";
-import { SpawnerPacket as ProtoPacket, SpawnerPacketType } from "../../proto/spawner/packet/v1/packet_pb";
+import {
+	SpawnerPacket as ProtoPacket,
+	SpawnerPacketType,
+} from "../../proto/spawner/packet/v1/packet_pb";
 import { EventActorType } from "../../proto/spawner/routing/v1/routing_pb";
 import { TextEvent } from "../../proto/spawner/text/v1/text_pb";
+import type {
+	ApiKey,
+	ConnectionConfig,
+	Accessor,
+	ConnectionError,
+} from "../common/types";
 import { ConnectionState } from "../common/types";
-import type { ApiKey } from "../common/types";
-import type { ConnectionConfig } from "../common/types";
-import type { ConnectionError } from "../common/types";
 import { Channel } from "../entities/channel.entity";
 import type { Character } from "../entities/character.entity";
 import type { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
@@ -21,6 +27,7 @@ interface ConnectionProps {
 	workspaceId: string;
 	scene?: Scene;
 	player?: Player;
+	sessionAccessor?: Accessor<SessionToken>;
 	onOpen?: () => void;
 	onError?: (err: ConnectionError) => void;
 	onMessage?: (packet: SpawnerPacket) => void;
@@ -80,9 +87,19 @@ export class ConnectionService {
 
 		this.state = ConnectionState.ACTIVATING;
 
-		await this.ensureSessionToken();
+		let session: SessionToken | undefined;
+		if (this.connectionProps.sessionAccessor) {
+			session = await this.connectionProps.sessionAccessor.get();
+		}
+
+		const prevSessionToken = this.sessionToken;
+		await this.ensureSessionToken(session);
 
 		if (!this.sessionToken) return;
+
+		if (prevSessionToken !== this.sessionToken) {
+			this.connectionProps.sessionAccessor?.set(this.sessionToken);
+		}
 
 		const [stream, loadedScene] = await this.mainService.openSession({
 			sessionToken: this.sessionToken,
@@ -100,7 +117,11 @@ export class ConnectionService {
 		this.state = ConnectionState.ACTIVE;
 		console.log("Connection is active. You are ready to open the channel.");
 
-		const channel = await this.mainService.openChannel(this.sessionToken, this.players, this.characters);
+		const channel = await this.mainService.openChannel(
+			this.sessionToken,
+			this.players,
+			this.characters,
+		);
 
 		this.channel = Channel.convertProto(channel);
 	}
@@ -170,12 +191,14 @@ export class ConnectionService {
 		return sessionToken;
 	}
 
-	private async ensureSessionToken() {
-		if (!this.sessionToken) {
-			const sessionToken = await this.generateSessionToken();
+	private async ensureSessionToken(session?: SessionToken) {
+		let sessionToken = session ?? this.sessionToken;
 
-			this.sessionToken = sessionToken;
+		if (!sessionToken || SessionToken.isExpired(sessionToken)) {
+			sessionToken = await this.generateSessionToken();
 		}
+
+		this.sessionToken = sessionToken;
 
 		return this.sessionToken;
 	}

@@ -1,10 +1,11 @@
 import { GRPC_HOSTNAME } from "../common/config";
-import type { ApiKey, ConnectionConfig, Gateway } from "../common/types";
+import type { ApiKey, ConnectionConfig, Gateway, Accessor } from "../common/types";
 import type { ConnectionError } from "../common/types";
 import type { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
 import type { Player } from "../entities/player.entity";
 import type { Scene } from "../entities/scene.entity";
 import { ConnectionService } from "../services/connection-service";
+import type { SessionToken } from "../entities/session_token.entity";
 
 export class SpawnerClient {
 	private config: ConnectionConfig = {};
@@ -12,6 +13,7 @@ export class SpawnerClient {
 	private workspaceId: string | undefined;
 	private scene: Scene | undefined;
 	private player: Player | undefined;
+  private sessionAccessor: Accessor<SessionToken> | undefined;
 	private onOpen: (() => void) | undefined;
 	private onError: ((err: ConnectionError) => void) | undefined;
 	private onMessage: ((packet: SpawnerPacket) => void) | undefined;
@@ -25,6 +27,7 @@ export class SpawnerClient {
 			config,
 			apiKey: this.apiKey!,
 			workspaceId: this.workspaceId!,
+      sessionAccessor: this.sessionAccessor,
 			scene: this.scene,
 			player: this.player,
 			onOpen: this.onOpen,
@@ -113,6 +116,12 @@ export class SpawnerClient {
 
 		return this;
 	}
+
+  public setSessionAccessor(props: Accessor<SessionToken>) {
+    this.sessionAccessor = props;
+
+    return this;
+  }
 
 	private validate() {
 		if (!this.apiKey?.key || !this.apiKey.secret) {

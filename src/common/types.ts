@@ -26,6 +26,13 @@ export enum ConnectionState {
 	INACTIVE = "INACTIVE",
 }
 
+export type Awaitable<T> = T | PromiseLike<T>;
+
+export interface Accessor<T> {
+  get: () => Awaitable<T | undefined>;
+  set: (content: T) => Awaitable<void>;
+}
+
 export interface ConnectionConfig {
 	gateway?: Gateway;
 }
