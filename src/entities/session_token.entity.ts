@@ -1,4 +1,6 @@
+import { Timestamp, TimestampSchema } from "@bufbuild/protobuf/wkt";
 import type { GenerateSessionTokenResponse } from "../../proto/spawner/main/v1/main_pb";
+import { create } from "@bufbuild/protobuf";
 
 interface SessionTokenProps {
 	sessionId: string;
@@ -30,12 +32,25 @@ export class SessionToken {
 		return timeDiff <= 0;
 	}
 
+  private static timestampToDate(timestamp: Timestamp): Date {
+    const millisFromSeconds = BigInt(timestamp.seconds) * BigInt(1000);
+  
+    const millisFromNanos = BigInt(timestamp.nanos) / BigInt(1_000_000);
+  
+    const totalMillis = millisFromSeconds + millisFromNanos;
+    
+    return new Date(Number(totalMillis));
+}
+
 	static convertProto(proto: GenerateSessionTokenResponse) {
+    const data = create(TimestampSchema, proto.expireTime)
+    data.nanos
+    data.seconds
 		return new SessionToken({
 			sessionId: proto.sessionId,
 			token: proto.token,
 			tokenType: proto.tokenType,
-			expireTime: proto.expireTime?.toDate(),
+			expireTime: this.timestampToDate(create(TimestampSchema, proto.expireTime))
 		});
 	}
 }

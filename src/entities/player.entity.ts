@@ -26,16 +26,17 @@ export class Player {
 		this.description = description;
 	}
 
-	private static validateData<T>(data: string, validValues: T[]) {
-		let out: T;
-		if (validValues.includes(data as T)) {
-			out = data as T;
-			return out;
-		}
-		console.warn(`${data} is not a valid value.`);
-		out = "NONE" as T;
-		return out;
-	}
+  private static validateData<T>(data: string, validValues: T[]): T {
+    let out: T;
+    if (validValues.indexOf(data as T) !== -1) {
+        out = data as T;
+        return out;
+    }
+    console.warn(`${data} is not a valid value.`);
+    out = "NONE" as T;
+    return out;
+}
+
 
 	static convertProto(props: PlayerActor) {
 		const { id, displayName, ageGroup, gender, description } = props;

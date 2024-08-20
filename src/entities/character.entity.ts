@@ -16,8 +16,17 @@ export class Character {
 		this.displayName = displayName;
 	}
 
+  private static isCharacterActor(proto: any): proto is CharacterActor {
+    return (
+        proto &&
+        typeof proto.name === "string" &&
+        typeof proto.displayName === "string" &&
+        typeof proto.customId === "string"
+    );
+  }
+
 	static convertProto(proto: SceneCharacter | CharacterActor) {
-		if (proto instanceof CharacterActor) {
+		if (this.isCharacterActor(proto)) {
 			const { displayName, customId } = proto;
 			return new Character({
 				id: customId,

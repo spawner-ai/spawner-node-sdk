@@ -1,33 +1,60 @@
 import type { TextEvent as ProtoText } from "../../../proto/spawner/text/v1/text_pb";
+import type { CommandTriggered as ProtoCommandTriggered } from "../../../proto/spawner/text/v1/text_pb";
+
+interface CommandTriggeredProps {
+  name: string
+  customId: string
+}
+
+export class CommandTriggered {
+  readonly name;
+  readonly customId;
+
+  constructor(props: CommandTriggeredProps){
+    const { name, customId } = props
+    this.name = name;
+    this.customId = customId
+  }
+
+  static convertProto(proto: ProtoCommandTriggered){
+    return new CommandTriggered({
+      name: proto.name,
+      customId: proto.customId
+    })
+  }
+}
 
 interface TextProps {
 	utteranceId: string;
 	text: string;
-	delta: string;
-	final: boolean;
+	delta?: string;
+	final?: boolean;
+  command?: CommandTriggered;
 }
 
 export class TextEvent {
 	readonly utteranceId: string;
 	readonly text: string;
-	readonly delta: string;
-	readonly final: boolean;
+	readonly delta?: string;
+	readonly final?: boolean;
+  readonly command?: CommandTriggered;
 
 	constructor(props: TextProps) {
-		const { utteranceId, text, delta, final } = props;
+		const { utteranceId, text, delta, final, command } = props;
 		this.utteranceId = utteranceId;
 		this.text = text;
 		this.delta = delta;
 		this.final = final;
+    this.command = command;
 	}
 
 	static convertProto(proto: ProtoText) {
-		proto.utteranceId;
 		return new TextEvent({
 			utteranceId: proto.utteranceId,
 			text: proto.text,
 			delta: proto.delta,
 			final: proto.final,
+      command: proto.command && CommandTriggered.convertProto(proto.command)
 		});
 	}
 }

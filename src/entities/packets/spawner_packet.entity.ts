@@ -1,13 +1,8 @@
-import { ChannelController as ProtoChannelController } from "../../../proto/spawner/channel/v1/channel_pb";
-import { EmotionEvent as ProtoEmotionEvent } from "../../../proto/spawner/emotion/v1/emotion_pb";
-import { InputFilterEvent as ProtoInputFilterEvent } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
-import { KnowledgeEvent as ProtoKnowledgeEvent } from "../../../proto/spawner/knowledge/v1/knowledge_pb";
+import { create } from "@bufbuild/protobuf";
 import {
 	type SpawnerPacket as ProtoPacket,
 	SpawnerPacketType as ProtoSpawnerPacketType,
 } from "../../../proto/spawner/packet/v1/packet_pb";
-import { SessionController as ProtoSessionController } from "../../../proto/spawner/session/v1/session_pb";
-import { TextEvent as ProtoTextEvent } from "../../../proto/spawner/text/v1/text_pb";
 import { ChannelController } from "./channel_controller";
 import { EmotionEvent } from "./emotion.entity";
 import { PacketError } from "./error.entity";
@@ -16,6 +11,13 @@ import { KnowledgeEvent } from "./knowledge.entity";
 import { Routing } from "./routing.entity";
 import { SessionController } from "./session_controller.entity";
 import { TextEvent } from "./text.entity";
+import { Timestamp, TimestampSchema } from "@bufbuild/protobuf/wkt";
+import { TextEvent as ProtoTextEvent, TextEventSchema } from "../../../proto/spawner/text/v1/text_pb";
+import { EmotionEvent as ProtoEmotionEvent, EmotionEventSchema } from "../../../proto/spawner/emotion/v1/emotion_pb";
+import { KnowledgeEvent as ProtoKnowledgeEvent, KnowledgeEventSchema } from "../../../proto/spawner/knowledge/v1/knowledge_pb";
+import { InputFilterEvent as ProtoInputFilterEvent, InputFilterEventSchema } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
+import { SessionController as ProtoSessionController, SessionControllerSchema } from "../../../proto/spawner/session/v1/session_pb";
+import { ChannelController as ProtoChannelController, ChannelControllerSchema } from "../../../proto/spawner/channel/v1/channel_pb";
 
 enum SpawnerPacketType {
 	UNSPECIFIED = "UNSPECIFIED",
@@ -111,36 +113,53 @@ export class SpawnerPacket {
 		return this.type === SpawnerPacketType.CHANNEL_CONTROLLER;
 	}
 
+  private static timestampToDate(timestamp: Timestamp): Date {
+    const millisFromSeconds = BigInt(timestamp.seconds) * BigInt(1000);
+  
+    const millisFromNanos = BigInt(timestamp.nanos) / BigInt(1_000_000);
+  
+    const totalMillis = millisFromSeconds + millisFromNanos;
+    
+    return new Date(Number(totalMillis));
+  }
+
 	static convertProto(proto: ProtoPacket): SpawnerPacket {
 		const type = SpawnerPacket.getType(proto);
 		const { timestamp, routing, success, error, payload } = proto;
 		const { value } = payload;
 
+    const text = create(TextEventSchema)
+    const emotion = create(EmotionEventSchema)
+    const knowledge = create(KnowledgeEventSchema)
+    const inputFilter = create(InputFilterEventSchema)
+    const sessionController = create(SessionControllerSchema)
+    const channelController = create(ChannelControllerSchema)
+
 		return new SpawnerPacket({
 			type,
-			date: timestamp?.toDate(),
+			date: this.timestampToDate(create(TimestampSchema, timestamp)),
 			routing: routing && Routing.convertProto(routing),
 			success,
 			...(success && {
 				error: error && PacketError.convertProto(error),
 			}),
-			...(value instanceof ProtoTextEvent && {
-				text: TextEvent.convertProto(value),
+			...(typeof value === typeof text && {
+				text: TextEvent.convertProto(value as ProtoTextEvent),
 			}),
-			...(value instanceof ProtoEmotionEvent && {
-				emotion: EmotionEvent.convertProto(value),
+			...(typeof value === typeof emotion && {
+				emotion: EmotionEvent.convertProto(value as ProtoEmotionEvent),
 			}),
-			...(value instanceof ProtoKnowledgeEvent && {
-				knowledge: KnowledgeEvent.convertProto(value),
+			...(typeof value === typeof knowledge && {
+				knowledge: KnowledgeEvent.convertProto(value as ProtoKnowledgeEvent),
 			}),
-			...(value instanceof ProtoInputFilterEvent && {
-				inputFilter: InputFilterEvent.convertProto(value),
+			...(typeof value === typeof inputFilter && {
+				inputFilter: InputFilterEvent.convertProto(value as ProtoInputFilterEvent),
 			}),
-			...(value instanceof ProtoSessionController && {
-				sessionController: SessionController.convertProto(value),
+			...(typeof value === typeof sessionController && {
+				sessionController: SessionController.convertProto(value as ProtoSessionController),
 			}),
-			...(value instanceof ProtoChannelController && {
-				channelController: ChannelController.convertProto(value),
+			...(typeof value === typeof channelController && {
+				channelController: ChannelController.convertProto(value as ProtoChannelController),
 			}),
 		});
 	}

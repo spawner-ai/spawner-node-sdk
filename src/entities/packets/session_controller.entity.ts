@@ -1,11 +1,14 @@
+import { create } from "@bufbuild/protobuf";
 import { Scene as ProtoScene } from "../../../proto/spawner/scene/v1/scene_pb";
 import {
 	type SessionController as ProtoSessionController,
 	SessionControllerType as ProtoSessionControllerType,
 	SessionMutationEvent as ProtoSessionMutationEvent,
 	SessionMutationEventType as ProtoSessionMutationEventType,
+  SessionMutationEventSchema
 } from "../../../proto/spawner/session/v1/session_pb";
 import { Scene, SceneMutationEvent } from "../scene.entity";
+import { SceneSchema } from "../../../proto/spawner/scene/v1/scene_pb";
 
 enum SessionControllerType {
 	UNSPECIFIED = "UNSPECIFIED",
@@ -43,7 +46,7 @@ class SessionMutationEvent {
 		});
 	}
 
-	private static getType(proto: ProtoSessionMutationEvent) {
+	static getType(proto: ProtoSessionMutationEvent) {
 		const { type } = proto;
 
 		switch (type) {
@@ -75,13 +78,16 @@ export class SessionController {
 		const type = SessionController.getType(proto);
 		const { value } = proto.payload;
 
+    const sessionMutationEvent = create(SessionMutationEventSchema)
+    const scene = create(SceneSchema)
+
 		return new SessionController({
 			type,
-			...(value instanceof ProtoSessionMutationEvent && {
-				sessionMutation: SessionMutationEvent.convertProto(value),
+			...(typeof value === typeof sessionMutationEvent && {
+				sessionMutation: SessionMutationEvent.convertProto(value as ProtoSessionMutationEvent),
 			}),
-			...(value instanceof ProtoScene && {
-				scene: Scene.convertProto(value),
+			...(typeof value === typeof scene && {
+				scene: Scene.convertProto(value as ProtoScene),
 			}),
 		});
 	}

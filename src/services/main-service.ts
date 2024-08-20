@@ -1,22 +1,25 @@
 import { type CallOptions, type PromiseClient, createPromiseClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { type WritableIterable, createWritableIterable } from "@connectrpc/connect/protocol";
-import { MainService } from "../../proto/spawner/main/v1/main_connect";
-import { type FeatureConfiguration, GenerateSessionTokenRequest } from "../../proto/spawner/main/v1/main_pb";
-import { SpawnerPacket as ProtoPacket, SpawnerPacketType } from "../../proto/spawner/packet/v1/packet_pb";
-import type { ConnectionConfig } from "../common/types";
+import { create, toJson } from "@bufbuild/protobuf";
 
-import { Actor, CharacterActor, PlayerActor } from "../../proto/spawner/actor/v1/actor_pb";
+import { GenerateSessionTokenRequestSchema, MainService } from "../../proto/spawner/main/v1/main_pb";
+import { MainServiceType } from "../common/types";
+import { type FeatureConfiguration, GenerateSessionTokenRequest } from "../../proto/spawner/main/v1/main_pb";
+import { SpawnerPacketSchema, SpawnerPacket as ProtoPacket, SpawnerPacketType } from "../../proto/spawner/packet/v1/packet_pb";
+import type { ConnectionConfig } from "../common/types";
+import { ActorSchema, CharacterActorSchema, PlayerActorSchema } from "../../proto/spawner/actor/v1/actor_pb";
 import {
 	ChannelController,
+	ChannelControllerSchema,
 	ChannelControllerType,
-	ChannelHost,
-	ChannelMember,
+	ChannelHostSchema,
+	ChannelMemberSchema,
 } from "../../proto/spawner/channel/v1/channel_pb";
 import { LanguageCode } from "../../proto/spawner/language_code/v1/language_code_pb";
-import { Scene as ProtoScene } from "../../proto/spawner/scene/v1/scene_pb";
-import { SessionController, SessionControllerType } from "../../proto/spawner/session/v1/session_pb";
-import type MainServiceType from "../common/types";
+import { SceneSchema as ProtoSceneSchema, Scene as ProtoScene } from "../../proto/spawner/scene/v1/scene_pb";
+import { SessionController, SessionControllerSchema, SessionControllerType } from "../../proto/spawner/session/v1/session_pb";
+
 import type { ConnectionError } from "../common/types";
 import type { Character } from "../entities/character.entity";
 import { PacketError } from "../entities/packets/error.entity";
@@ -57,7 +60,7 @@ export class SpawnerMainService {
 
 	private createClient() {
 		const { hostname } = this.config.gateway!;
-		const client = createPromiseClient<MainServiceType>(
+		const client = createPromiseClient(
 			MainService,
 			createGrpcTransport({
 				httpVersion: "2",
@@ -80,6 +83,7 @@ export class SpawnerMainService {
 			try {
 				for await (const res of responses) {
 					if (res.success) {
+            console.log('debug packet res:', res)
 						onMessage?.(SpawnerPacket.convertProto(res));
 					} else {
 						// caught spawner packet error
@@ -101,29 +105,42 @@ export class SpawnerMainService {
 	}
 
 	async openChannel(sessionToken: SessionToken, players: Player[], characters: Character[]) {
-		const host = new ChannelHost({
-			sessionId: sessionToken.sessionId,
-		});
-		const members = [new ChannelMember({ sessionId: sessionToken.sessionId })];
 
-		const actor = new Actor({
-			players: players.map((p) => new PlayerActor({ id: p.id, displayName: p.display_name })),
-			characters: characters.map((c) => new CharacterActor({ customId: c.id })),
-		});
-		const channelController = new ChannelController({
-			type: ChannelControllerType.CREATE,
+    const host = create(ChannelHostSchema, {
+      sessionId: sessionToken.sessionId,
+    });
+
+    const members = [create(ChannelMemberSchema, {
+      sessionId: sessionToken.sessionId,
+    })]
+
+    const actor = create(ActorSchema, {
+			players: players.map((p) => 
+        create(PlayerActorSchema, {
+          id: p.id, displayName: p.display_name
+        })
+    ),
+			characters: characters.map((c) => 
+        create(CharacterActorSchema, {
+          customId: c.id
+        })
+    ),
+		})
+
+    const channelController = create(ChannelControllerSchema, {
+      type: ChannelControllerType.CREATE,
 			host,
 			members,
 			actor,
-		});
+    })
 
-		const packet = new ProtoPacket({
-			type: SpawnerPacketType.CHANNEL_CONTROLLER,
+    const packet = create(SpawnerPacketSchema, {
+      type: SpawnerPacketType.CHANNEL_CONTROLLER,
 			payload: {
 				case: "channelController",
 				value: channelController,
 			},
-		});
+    })
 
 		const options = this.getOptions(sessionToken);
 
@@ -134,14 +151,14 @@ export class SpawnerMainService {
 	}
 
 	async generateSessionToken(props: GenerateSessionTokenProps) {
-		const generateSessionTokenRequest = new GenerateSessionTokenRequest({
-			apiKey: props.apiKey,
+    const generateSessionTokenRequest = create(GenerateSessionTokenRequestSchema, {
+      apiKey: props.apiKey,
 			apiSecret: props.apiSecret,
 			workspaceId: props.workspaceId,
 			playerId: props.playerId,
 			featureConfiguration: props.featureConfiguration,
 			languageCode: LanguageCode.JA,
-		});
+    });
 
 		const sessionToken = await this.client.generateSessionToken(generateSessionTokenRequest);
 
@@ -153,26 +170,26 @@ export class SpawnerMainService {
 			throw Error("Session token is not valid. Generate a session token before loading scene.");
 		}
 
-		const protoScene = new ProtoScene({
-			customId: scene?.id,
+    const protoScene = create(ProtoSceneSchema, {
+      customId: scene?.id,
 			description: scene?.description,
-		});
+    })
 
-		const sessionController = new SessionController({
-			type: SessionControllerType.LOAD,
+    const sessionController = create(SessionControllerSchema, {
+      type: SessionControllerType.LOAD,
 			payload: {
 				value: protoScene,
 				case: "scene",
 			},
-		});
+    })
 
-		const packet = new ProtoPacket({
-			type: SpawnerPacketType.SESSION_CONTROLLER,
+    const packet = create(SpawnerPacketSchema, {
+      type: SpawnerPacketType.SESSION_CONTROLLER,
 			payload: {
 				case: "sessionController",
 				value: sessionController,
 			},
-		});
+    })
 
 		const options = this.getOptions(sessionToken);
 

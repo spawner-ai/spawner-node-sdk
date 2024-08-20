@@ -56,31 +56,27 @@ class EmotionScore {
 
 interface EmotionProps {
 	utteranceId: string;
-	name: string;
 	result: EmotionType;
 	score?: EmotionScore;
 }
 
 export class EmotionEvent {
 	readonly utteranceId: string;
-	readonly name: string;
 	readonly result: EmotionType = EmotionType.UNSPECIFIED;
 	readonly score?: EmotionScore;
 
 	constructor(props: EmotionProps) {
-		const { utteranceId, name, result, score } = props;
+		const { utteranceId, result, score } = props;
 		this.utteranceId = utteranceId;
-		this.name = name;
 		this.result = result;
 		this.score = score;
 	}
 
 	static convertProto(proto: ProtoEmotion) {
-		const { utteranceId, name, score } = proto;
+		const { utteranceId, score } = proto;
 		const result = EmotionEvent.getType(proto);
 		return new EmotionEvent({
 			utteranceId,
-			name,
 			result,
 			score: score && EmotionScore.convertProto(score),
 		});

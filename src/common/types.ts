@@ -1,13 +1,16 @@
-import type { MethodKind } from "@bufbuild/protobuf";
-import type {
-	GenerateSessionTokenRequest,
-	GenerateSessionTokenResponse,
-	GetSessionRequest,
-	GetSessionResponse,
-	LeaveChannelRequest,
-	LeaveChannelResponse,
-} from "../../proto/spawner/main/v1/main_pb";
-import type { SpawnerPacket } from "../../proto/spawner/packet/v1/packet_pb.js";
+
+import { GenService } from "@bufbuild/protobuf/codegenv1";
+import { 
+  GenerateSessionTokenRequestSchema,
+  GenerateSessionTokenResponseSchema,
+  RefreshSessionTokenRequestSchema,
+  RefreshSessionTokenResponseSchema,
+  GetSessionRequestSchema,
+  GetSessionResponseSchema,
+  LeaveChannelRequestSchema,
+  LeaveChannelResponseSchema
+ } from "../../proto/spawner/main/v1/main_pb";
+ import type { SpawnerPacketSchema } from "../../proto/spawner/packet/v1/packet_pb"
 import type { PacketError } from "../entities/packets/error.entity";
 
 export interface ApiKey {
@@ -39,75 +42,70 @@ export interface ConnectionConfig {
 
 export type ConnectionError = Error | Event | PacketError | unknown;
 
-export default interface MainServiceType {
-	readonly typeName: "spawner.main.v1.MainService";
-	readonly methods: {
-		/**
-		 * Generates a JWT to access the API with a given API key and secret.
-		 * Initializes session record and loads workspace data to Redis.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.GenerateSessionToken
-		 */
-		readonly generateSessionToken: {
-			readonly name: "GenerateSessionToken";
-			readonly I: typeof GenerateSessionTokenRequest;
-			readonly O: typeof GenerateSessionTokenResponse;
-			readonly kind: MethodKind.Unary;
-		};
-		/**
-		 * Gets session for passed identifier.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.GetSession
-		 */
-		readonly getSession: {
-			readonly name: "GetSession";
-			readonly I: typeof GetSessionRequest;
-			readonly O: typeof GetSessionResponse;
-			readonly kind: MethodKind.Unary;
-		};
-		/**
-		 * Loads scene to a session. Accepts adhoc scenes.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.LoadScene
-		 */
-		readonly loadScene: {
-			readonly name: "LoadScene";
-			readonly I: typeof SpawnerPacket;
-			readonly O: typeof SpawnerPacket;
-			readonly kind: MethodKind.Unary;
-		};
-		/**
-		 * Handles session specific processes.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.ConnectSession
-		 */
-		readonly connectSession: {
-			readonly name: "ConnectSession";
-			readonly I: typeof SpawnerPacket;
-			readonly O: typeof SpawnerPacket;
-			readonly kind: MethodKind.BiDiStreaming;
-		};
-		/**
-		 * Opens a channel with initial values.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.OpenChannel
-		 */
-		readonly openChannel: {
-			readonly name: "OpenChannel";
-			readonly I: typeof SpawnerPacket;
-			readonly O: typeof SpawnerPacket;
-			readonly kind: MethodKind.Unary;
-		};
-		/**
-		 * Leaves current channel the session is subscribed to.
-		 *
-		 * @generated from rpc spawner.main.v1.MainService.LeaveChannel
-		 */
-		readonly leaveChannel: {
-			readonly name: "LeaveChannel";
-			readonly I: typeof LeaveChannelRequest;
-			readonly O: typeof LeaveChannelResponse;
-			readonly kind: MethodKind.Unary;
-		};
-	};
-}
+export type MainServiceType = GenService<{
+  generateSessionToken: {
+    methodKind: "unary";
+    input: typeof GenerateSessionTokenRequestSchema;
+    output: typeof GenerateSessionTokenResponseSchema;
+  };
+  /**
+   * Returns session token from a refresh token.
+   *
+   * @generated from rpc spawner.main.v1.MainService.RefreshSessionToken
+   */
+  refreshSessionToken: {
+    methodKind: "unary";
+    input: typeof RefreshSessionTokenRequestSchema;
+    output: typeof RefreshSessionTokenResponseSchema;
+  };
+  /**
+   * Gets session for passed identifier.
+   *
+   * @generated from rpc spawner.main.v1.MainService.GetSession
+   */
+  getSession: {
+    methodKind: "unary";
+    input: typeof GetSessionRequestSchema;
+    output: typeof GetSessionResponseSchema;
+  };
+  /**
+   * Loads scene to a session. Accepts adhoc scenes.
+   *
+   * @generated from rpc spawner.main.v1.MainService.LoadScene
+   */
+  loadScene: {
+    methodKind: "unary";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  };
+  /**
+   * Handles session specific processes.
+   *
+   * @generated from rpc spawner.main.v1.MainService.ConnectSession
+   */
+  connectSession: {
+    methodKind: "bidi_streaming";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  };
+  /**
+   * Opens a channel with initial values.
+   *
+   * @generated from rpc spawner.main.v1.MainService.OpenChannel
+   */
+  openChannel: {
+    methodKind: "unary";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  };
+  /**
+   * Leaves current channel the session is subscribed to.
+   *
+   * @generated from rpc spawner.main.v1.MainService.LeaveChannel
+   */
+  leaveChannel: {
+    methodKind: "unary";
+    input: typeof LeaveChannelRequestSchema;
+    output: typeof LeaveChannelResponseSchema;
+  };
+}>

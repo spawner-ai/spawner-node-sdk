@@ -1,11 +1,12 @@
 import type { WritableIterable } from "@connectrpc/connect/protocol";
-import { FeatureConfiguration } from "../../proto/spawner/main/v1/main_pb";
+import { create, toJson } from "@bufbuild/protobuf";
+import { FeatureConfigurationSchema } from "../../proto/spawner/main/v1/main_pb";
 import {
 	SpawnerPacket as ProtoPacket,
+	SpawnerPacketSchema,
 	SpawnerPacketType,
 } from "../../proto/spawner/packet/v1/packet_pb";
-import { EventActorType } from "../../proto/spawner/routing/v1/routing_pb";
-import { TextEvent } from "../../proto/spawner/text/v1/text_pb";
+import { EventActorType, EventCharacterSchema, EventPlayerSchema } from "../../proto/spawner/routing/v1/routing_pb";
 import type {
 	ApiKey,
 	ConnectionConfig,
@@ -20,6 +21,9 @@ import { Player } from "../entities/player.entity";
 import { Scene } from "../entities/scene.entity";
 import { SessionToken } from "../entities/session_token.entity";
 import { SpawnerMainService } from "./main-service";
+import { TextEvent } from "../entities/packets/text.entity";
+import { TextEventSchema } from "../../proto/spawner/text/v1/text_pb";
+
 
 interface ConnectionProps {
 	config: ConnectionConfig;
@@ -136,6 +140,11 @@ export class ConnectionService {
 		return this.state === ConnectionState.ACTIVE;
 	}
 
+  getStream(){
+    if(!this.isActive()) return
+    return this.stream;
+  }
+
 	getConnectionState() {
 		return this.state;
 	}
@@ -143,41 +152,48 @@ export class ConnectionService {
 	async sendText(text: string) {
 		this.validate();
 
-		const textEvent = new TextEvent({
+		const textEvent = create(TextEventSchema, {
 			utteranceId: "utterance_id",
 			text,
 		});
 
-		const packet = new ProtoPacket({
-			type: SpawnerPacketType.TEXT,
+    const eventPlayer = create(EventPlayerSchema, {
+      id: this.players[0].id,
+    })
+
+    const eventCharacter = create(EventCharacterSchema, {
+      customId: this.characters[0].id,
+    })
+
+		const packet = create(SpawnerPacketSchema, {
+      type: SpawnerPacketType.TEXT,
 			routing: {
 				source: {
 					type: EventActorType.PLAYER,
-					player: {
-						id: this.players[0].id,
-					},
+					player: eventPlayer
 				},
 				target: {
 					type: EventActorType.CHARACTER,
-					character: {
-						customId: this.characters[0].id,
-					},
+					character: eventCharacter
 				},
 			},
 			payload: {
 				case: "text",
 				value: textEvent,
-			},
-		});
+			}
+    }) 
 
 		await this.stream.write(packet);
 	}
 
 	async generateSessionToken() {
-		const featureConfiguration = new FeatureConfiguration({
-			emotion: false,
+		
+    const featureConfiguration = create(FeatureConfigurationSchema, {
+      emotion: false,
 			inputFilter: false,
-		});
+      command: true,
+      memory:true
+    })
 		const protoSession = await this.mainService.generateSessionToken({
 			apiKey: this.connectionProps.apiKey.key,
 			apiSecret: this.connectionProps.apiKey.secret,
