@@ -78,12 +78,11 @@ export class SpawnerMainService {
 		const responses = this.client.connectSession(connection, options);
 
 		const loadedScene = await this.loadScene(sessionToken, scene);
-
+    
 		const processResponses = async () => {
 			try {
 				for await (const res of responses) {
 					if (res.success) {
-            console.log('debug packet res:', res)
 						onMessage?.(SpawnerPacket.convertProto(res));
 					} else {
 						// caught spawner packet error
@@ -94,8 +93,6 @@ export class SpawnerMainService {
 			} catch (err: unknown) {
 				// caught grpc error
 				onError?.(err);
-			} finally {
-				onClose?.();
 			}
 		};
 
