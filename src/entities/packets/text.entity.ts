@@ -27,16 +27,16 @@ export class CommandTriggered {
 interface TextProps {
 	utteranceId: string;
 	text: string;
-	delta?: string;
-	final?: boolean;
+	delta: string;
+	final: boolean;
   command?: CommandTriggered;
 }
 
 export class TextEvent {
 	readonly utteranceId: string;
 	readonly text: string;
-	readonly delta?: string;
-	readonly final?: boolean;
+	readonly delta: string;
+	readonly final: boolean;
   readonly command?: CommandTriggered;
 
 	constructor(props: TextProps) {
@@ -49,12 +49,13 @@ export class TextEvent {
 	}
 
 	static convertProto(proto: ProtoText) {
+    const { utteranceId, text, delta, final, command} =proto
 		return new TextEvent({
-			utteranceId: proto.utteranceId,
-			text: proto.text,
-			delta: proto.delta,
-			final: proto.final,
-      command: proto.command && CommandTriggered.convertProto(proto.command)
+			utteranceId: utteranceId,
+			text: text,
+			delta: delta,
+			final: final,
+      command: command && CommandTriggered.convertProto(command)
 		});
 	}
 }
