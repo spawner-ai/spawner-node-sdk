@@ -22,6 +22,12 @@ export interface Gateway {
 	hostname: string;
 	ssl?: boolean;
 }
+export interface FeatureConfiguration {
+  emotion: boolean,
+  inputFilter: boolean,
+  command: boolean,
+  memory: boolean
+}
 
 export enum ConnectionState {
 	ACTIVE = "ACTIVE",
@@ -38,6 +44,7 @@ export interface Accessor<T> {
 
 export interface ConnectionConfig {
 	gateway?: Gateway;
+  feature?: FeatureConfiguration;
 }
 
 export type ConnectionError = Error | Event | PacketError | unknown;

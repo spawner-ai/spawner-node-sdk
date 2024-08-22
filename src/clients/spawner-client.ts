@@ -6,6 +6,7 @@ import type { Player } from "../entities/player.entity";
 import type { Scene } from "../entities/scene.entity";
 import { ConnectionService } from "../services/connection-service";
 import type { SessionToken } from "../entities/session_token.entity";
+import type { FeatureConfiguration } from "../common/types";
 
 export class SpawnerClient {
 	private config: ConnectionConfig = {};
@@ -54,7 +55,8 @@ export class SpawnerClient {
 
 	private ensureConfig() {
 		const gateway: Gateway = this.ensureGateway(this.config?.gateway);
-		const config: ConnectionConfig = { gateway };
+    const feature: FeatureConfiguration = this.ensureFeature(this.config?.feature);
+		const config: ConnectionConfig = { gateway, feature };
 		return config;
 	}
 
@@ -92,6 +94,16 @@ export class SpawnerClient {
 		const ssl = gateway?.ssl ?? true;
 		return { hostname, ssl };
 	}
+
+  private ensureFeature(feature?: FeatureConfiguration) {
+    return feature ??
+     {
+      emotion: false,
+      inputFilter: false,
+      command: false,
+      memory: false,
+    }
+  }
 
 	public setOnOpen(fn: () => void) {
 		this.onOpen = fn;
