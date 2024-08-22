@@ -67,10 +67,7 @@ export class ConnectionService {
 		this.onError = onError;
 
 		this.onMessage = (packet: SpawnerPacket) => {
-			// additional service code.
-			if (packet.isText()) {
 				onMessage?.(packet);
-			}
 		};
 
 		this.onClose = () => {
@@ -187,13 +184,8 @@ export class ConnectionService {
 	}
 
 	async generateSessionToken() {
-		
-    const featureConfiguration = create(FeatureConfigurationSchema, {
-      emotion: false,
-			inputFilter: false,
-      command: true,
-      memory:true
-    })
+		const { feature } = this.connectionProps.config
+    const featureConfiguration = create(FeatureConfigurationSchema, feature)
 		const protoSession = await this.mainService.generateSessionToken({
 			apiKey: this.connectionProps.apiKey.key,
 			apiSecret: this.connectionProps.apiKey.secret,
