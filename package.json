@@ -4,6 +4,7 @@
   "description": "Node.js SDK to integrate with Spawner API.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "npx tsc --build",
     "lint:check": "npx @biomejs/biome lint ./src",
