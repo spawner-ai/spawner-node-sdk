@@ -14,14 +14,14 @@ import { TextEvent } from "./text.entity";
 import { SentimentEvent } from "./sentiment.entity";
 import { PromptInjectionEvent } from "./prompt_injection.entity";
 import { Timestamp, TimestampSchema } from "@bufbuild/protobuf/wkt";
-import { TextEvent as ProtoTextEvent, TextEventSchema } from "../../../proto/spawner/text/v1/text_pb";
-import { EmotionEvent as ProtoEmotionEvent, EmotionEventSchema } from "../../../proto/spawner/emotion/v1/emotion_pb";
-import { KnowledgeEvent as ProtoKnowledgeEvent, KnowledgeEventSchema } from "../../../proto/spawner/knowledge/v1/knowledge_pb";
-import { InputFilterEvent as ProtoInputFilterEvent, InputFilterEventSchema } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
-import { SessionController as ProtoSessionController, SessionControllerSchema } from "../../../proto/spawner/session/v1/session_pb";
-import { ChannelController as ProtoChannelController, ChannelControllerSchema } from "../../../proto/spawner/channel/v1/channel_pb";
-import { SentimentEvent as ProtoSentimentEvent, SentimentEventSchema } from "../../../proto/spawner/sentiment/v1/sentiment_pb";
-import { PromptInjectionEvent as ProtoPromptInjectionEvent, PromptInjectionEventSchema } from "../../../proto/spawner/prompt_injection/v1/prompt_injection_pb";
+import { TextEvent as ProtoTextEvent } from "../../../proto/spawner/text/v1/text_pb";
+import { EmotionEvent as ProtoEmotionEvent } from "../../../proto/spawner/emotion/v1/emotion_pb";
+import { KnowledgeEvent as ProtoKnowledgeEvent } from "../../../proto/spawner/knowledge/v1/knowledge_pb";
+import { InputFilterEvent as ProtoInputFilterEvent } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
+import { SessionController as ProtoSessionController } from "../../../proto/spawner/session/v1/session_pb";
+import { ChannelController as ProtoChannelController } from "../../../proto/spawner/channel/v1/channel_pb";
+import { SentimentEvent as ProtoSentimentEvent } from "../../../proto/spawner/sentiment/v1/sentiment_pb";
+import { PromptInjectionEvent as ProtoPromptInjectionEvent } from "../../../proto/spawner/prompt_injection/v1/prompt_injection_pb";
 
 enum SpawnerPacketType {
 	UNSPECIFIED = "UNSPECIFIED",
@@ -97,6 +97,12 @@ export class SpawnerPacket {
 		if (this.isChannelController()) {
 			this.channelController = props.channelController;
 		}
+    if (this.isSentiment()) {
+			this.sentiment = props.sentiment;
+		}
+    if (this.isPromptInjection()) {
+			this.promptInjection = props.promptInjection;
+		}
 	}
 
 	isText() {
@@ -146,15 +152,6 @@ export class SpawnerPacket {
 		const { timestamp, routing, success, error, payload } = proto;
 		const { value } = payload;
 
-    const text = create(TextEventSchema)
-    const emotion = create(EmotionEventSchema)
-    const knowledge = create(KnowledgeEventSchema)
-    const inputFilter = create(InputFilterEventSchema)
-    const sessionController = create(SessionControllerSchema)
-    const channelController = create(ChannelControllerSchema)
-    const sentiment = create(SentimentEventSchema)
-    const promptInjection = create(PromptInjectionEventSchema)
-
 		return new SpawnerPacket({
 			type,
 			date: this.timestampToDate(create(TimestampSchema, timestamp)),
@@ -163,28 +160,28 @@ export class SpawnerPacket {
 			...(success && {
 				error: error && PacketError.convertProto(error),
 			}),
-			...(typeof value === typeof text && {
+			...(type === SpawnerPacketType.TEXT && {
 				text: TextEvent.convertProto(value as ProtoTextEvent),
 			}),
-			...(typeof value === typeof emotion && {
+			...(type === SpawnerPacketType.EMOTION && {
 				emotion: EmotionEvent.convertProto(value as ProtoEmotionEvent),
 			}),
-			...(typeof value === typeof knowledge && {
+			...(type === SpawnerPacketType.KNOWLEDGE && {
 				knowledge: KnowledgeEvent.convertProto(value as ProtoKnowledgeEvent),
 			}),
-			...(typeof value === typeof inputFilter && {
+			...(type === SpawnerPacketType.INPUT_FILTER && {
 				inputFilter: InputFilterEvent.convertProto(value as ProtoInputFilterEvent),
 			}),
-			...(typeof value === typeof sessionController && {
+			...(type === SpawnerPacketType.SESSION_CONTROLLER && {
 				sessionController: SessionController.convertProto(value as ProtoSessionController),
 			}),
-			...(typeof value === typeof channelController && {
+			...(type === SpawnerPacketType.CHANNEL_CONTROLLER && {
 				channelController: ChannelController.convertProto(value as ProtoChannelController),
 			}),
-      ...(typeof value === typeof sentiment && {
+      ...(type === SpawnerPacketType.SENTIMENT && {
 				sentiment: SentimentEvent.convertProto(value as ProtoSentimentEvent),
 			}),
-      ...(typeof value === typeof promptInjection && {
+      ...(type === SpawnerPacketType.PROMPT_INJECTION && {
 				promptInjection: PromptInjectionEvent.convertProto(value as ProtoPromptInjectionEvent),
 			}),
 		});
