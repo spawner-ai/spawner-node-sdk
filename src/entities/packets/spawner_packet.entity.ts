@@ -11,6 +11,8 @@ import { KnowledgeEvent } from "./knowledge.entity";
 import { Routing } from "./routing.entity";
 import { SessionController } from "./session_controller.entity";
 import { TextEvent } from "./text.entity";
+import { SentimentEvent } from "./sentiment.entity";
+import { PromptInjectionEvent } from "./prompt_injection.entity";
 import { Timestamp, TimestampSchema } from "@bufbuild/protobuf/wkt";
 import { TextEvent as ProtoTextEvent, TextEventSchema } from "../../../proto/spawner/text/v1/text_pb";
 import { EmotionEvent as ProtoEmotionEvent, EmotionEventSchema } from "../../../proto/spawner/emotion/v1/emotion_pb";
@@ -18,6 +20,8 @@ import { KnowledgeEvent as ProtoKnowledgeEvent, KnowledgeEventSchema } from "../
 import { InputFilterEvent as ProtoInputFilterEvent, InputFilterEventSchema } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
 import { SessionController as ProtoSessionController, SessionControllerSchema } from "../../../proto/spawner/session/v1/session_pb";
 import { ChannelController as ProtoChannelController, ChannelControllerSchema } from "../../../proto/spawner/channel/v1/channel_pb";
+import { SentimentEvent as ProtoSentimentEvent, SentimentEventSchema } from "../../../proto/spawner/sentiment/v1/sentiment_pb";
+import { PromptInjectionEvent as ProtoPromptInjectionEvent, PromptInjectionEventSchema } from "../../../proto/spawner/prompt_injection/v1/prompt_injection_pb";
 
 enum SpawnerPacketType {
 	UNSPECIFIED = "UNSPECIFIED",
@@ -27,6 +31,8 @@ enum SpawnerPacketType {
 	INPUT_FILTER = "INPUT_FILTER",
 	EMOTION = "EMOTION",
 	KNOWLEDGE = "KNOWLEDGE",
+  SENTIMENT = "SENTIMENT",
+  PROMPT_INJECTION = "PROMPT_INJECTION"
 }
 
 export interface SpawnerPacketProps {
@@ -41,6 +47,8 @@ export interface SpawnerPacketProps {
 	inputFilter?: InputFilterEvent;
 	sessionController?: SessionController;
 	channelController?: ChannelController;
+  sentiment?: SentimentEvent;
+  promptInjection?: PromptInjectionEvent;
 }
 
 export class SpawnerPacket {
@@ -57,6 +65,8 @@ export class SpawnerPacket {
 	readonly inputFilter?: InputFilterEvent;
 	readonly sessionController?: SessionController;
 	readonly channelController?: ChannelController;
+  readonly sentiment?: SentimentEvent;
+  readonly promptInjection?: PromptInjectionEvent;
 
 	constructor(props: SpawnerPacketProps) {
 		const { date, type, routing, success, error } = props;
@@ -113,6 +123,14 @@ export class SpawnerPacket {
 		return this.type === SpawnerPacketType.CHANNEL_CONTROLLER;
 	}
 
+  isSentiment() {
+		return this.type === SpawnerPacketType.SENTIMENT;
+	}
+
+  isPromptInjection() {
+    return this.type === SpawnerPacketType.PROMPT_INJECTION;
+  }
+
   private static timestampToDate(timestamp: Timestamp): Date {
     const millisFromSeconds = BigInt(timestamp.seconds) * BigInt(1000);
   
@@ -134,6 +152,8 @@ export class SpawnerPacket {
     const inputFilter = create(InputFilterEventSchema)
     const sessionController = create(SessionControllerSchema)
     const channelController = create(ChannelControllerSchema)
+    const sentiment = create(SentimentEventSchema)
+    const promptInjection = create(PromptInjectionEventSchema)
 
 		return new SpawnerPacket({
 			type,
@@ -161,6 +181,12 @@ export class SpawnerPacket {
 			...(typeof value === typeof channelController && {
 				channelController: ChannelController.convertProto(value as ProtoChannelController),
 			}),
+      ...(typeof value === typeof sentiment && {
+				sentiment: SentimentEvent.convertProto(value as ProtoSentimentEvent),
+			}),
+      ...(typeof value === typeof promptInjection && {
+				promptInjection: PromptInjectionEvent.convertProto(value as ProtoPromptInjectionEvent),
+			}),
 		});
 	}
 
@@ -179,6 +205,10 @@ export class SpawnerPacket {
 				return SpawnerPacketType.SESSION_CONTROLLER;
 			case ProtoSpawnerPacketType.CHANNEL_CONTROLLER:
 				return SpawnerPacketType.CHANNEL_CONTROLLER;
+      case ProtoSpawnerPacketType.SENTIMENT:
+        return SpawnerPacketType.SENTIMENT;
+      case ProtoSpawnerPacketType.PROMPT_INJECTION:
+        return SpawnerPacketType.PROMPT_INJECTION;
 			default:
 				return SpawnerPacketType.UNSPECIFIED;
 		}
