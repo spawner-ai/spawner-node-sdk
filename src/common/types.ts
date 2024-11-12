@@ -26,7 +26,8 @@ export interface FeatureConfiguration {
   emotion: boolean,
   inputFilter: boolean,
   command: boolean,
-  memory: boolean
+  memory: boolean,
+  reasoning: boolean
 }
 
 export enum ConnectionState {

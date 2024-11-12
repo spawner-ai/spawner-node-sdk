@@ -102,6 +102,7 @@ export class SpawnerClient {
       inputFilter: false,
       command: false,
       memory: false,
+      reasoning: false
     }
   }
 

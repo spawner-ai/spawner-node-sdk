@@ -190,7 +190,7 @@ export class ConnectionService {
 			apiKey: this.connectionProps.apiKey.key,
 			apiSecret: this.connectionProps.apiKey.secret,
 			workspaceId: this.connectionProps.workspaceId,
-			playerId: "player-1",
+			playerId: this.players[0].id,
 			featureConfiguration,
 		});
 

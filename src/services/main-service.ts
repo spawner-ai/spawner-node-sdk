@@ -156,7 +156,7 @@ export class SpawnerMainService {
 			featureConfiguration: props.featureConfiguration,
 			languageCode: LanguageCode.JA,
     });
-
+console.log(generateSessionTokenRequest)
 		const sessionToken = await this.client.generateSessionToken(generateSessionTokenRequest);
 
 		return sessionToken;
