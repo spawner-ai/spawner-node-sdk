@@ -9,19 +9,19 @@ import { PacketError } from "./error.entity";
 import { InputFilterEvent } from "./input_filter.entity";
 import { KnowledgeEvent } from "./knowledge.entity";
 import { Routing } from "./routing.entity";
-import { SessionController } from "./session_controller.entity";
 import { TextEvent } from "./text.entity";
 import { SentimentEvent } from "./sentiment.entity";
 import { PromptInjectionEvent } from "./prompt_injection.entity";
+import { WorldController } from "./world_controller.entity";
 import { Timestamp, TimestampSchema } from "@bufbuild/protobuf/wkt";
 import { TextEvent as ProtoTextEvent } from "../../../proto/spawner/text/v1/text_pb";
 import { EmotionEvent as ProtoEmotionEvent } from "../../../proto/spawner/emotion/v1/emotion_pb";
 import { KnowledgeEvent as ProtoKnowledgeEvent } from "../../../proto/spawner/knowledge/v1/knowledge_pb";
 import { InputFilterEvent as ProtoInputFilterEvent } from "../../../proto/spawner/input_filter/v1/input_filter_pb";
-import { SessionController as ProtoSessionController } from "../../../proto/spawner/session/v1/session_pb";
 import { ChannelController as ProtoChannelController } from "../../../proto/spawner/channel/v1/channel_pb";
 import { SentimentEvent as ProtoSentimentEvent } from "../../../proto/spawner/sentiment/v1/sentiment_pb";
 import { PromptInjectionEvent as ProtoPromptInjectionEvent } from "../../../proto/spawner/prompt_injection/v1/prompt_injection_pb";
+import { WorldController as ProtoWorldController } from "../../../proto/spawner/world/v1/world_pb";
 
 enum SpawnerPacketType {
 	UNSPECIFIED = "UNSPECIFIED",
@@ -32,7 +32,8 @@ enum SpawnerPacketType {
 	EMOTION = "EMOTION",
 	KNOWLEDGE = "KNOWLEDGE",
   SENTIMENT = "SENTIMENT",
-  PROMPT_INJECTION = "PROMPT_INJECTION"
+  PROMPT_INJECTION = "PROMPT_INJECTION",
+  WORLD_CONTROLLER = "WORLD_CONTROLLER"
 }
 
 export interface SpawnerPacketProps {
@@ -45,10 +46,10 @@ export interface SpawnerPacketProps {
 	emotion?: EmotionEvent;
 	knowledge?: KnowledgeEvent;
 	inputFilter?: InputFilterEvent;
-	sessionController?: SessionController;
 	channelController?: ChannelController;
   sentiment?: SentimentEvent;
   promptInjection?: PromptInjectionEvent;
+  worldController?: WorldController;
 }
 
 export class SpawnerPacket {
@@ -63,10 +64,10 @@ export class SpawnerPacket {
 	readonly emotion?: EmotionEvent;
 	readonly knowledge?: KnowledgeEvent;
 	readonly inputFilter?: InputFilterEvent;
-	readonly sessionController?: SessionController;
 	readonly channelController?: ChannelController;
   readonly sentiment?: SentimentEvent;
   readonly promptInjection?: PromptInjectionEvent;
+  readonly worldController?: WorldController;
 
 	constructor(props: SpawnerPacketProps) {
 		const { date, type, routing, success, error } = props;
@@ -91,9 +92,6 @@ export class SpawnerPacket {
 		if (this.isInputFilter()) {
 			this.inputFilter = props.inputFilter;
 		}
-		if (this.isSessionController()) {
-			this.sessionController = props.sessionController;
-		}
 		if (this.isChannelController()) {
 			this.channelController = props.channelController;
 		}
@@ -102,6 +100,9 @@ export class SpawnerPacket {
 		}
     if (this.isPromptInjection()) {
 			this.promptInjection = props.promptInjection;
+		}
+    if (this.isWorldController()) {
+			this.worldController = props.worldController;
 		}
 	}
 
@@ -135,6 +136,10 @@ export class SpawnerPacket {
 
   isPromptInjection() {
     return this.type === SpawnerPacketType.PROMPT_INJECTION;
+  }
+
+  isWorldController() {
+    return this.type === SpawnerPacketType.WORLD_CONTROLLER;
   }
 
   private static timestampToDate(timestamp: Timestamp): Date {
@@ -172,9 +177,6 @@ export class SpawnerPacket {
 			...(type === SpawnerPacketType.INPUT_FILTER && {
 				inputFilter: InputFilterEvent.convertProto(value as ProtoInputFilterEvent),
 			}),
-			...(type === SpawnerPacketType.SESSION_CONTROLLER && {
-				sessionController: SessionController.convertProto(value as ProtoSessionController),
-			}),
 			...(type === SpawnerPacketType.CHANNEL_CONTROLLER && {
 				channelController: ChannelController.convertProto(value as ProtoChannelController),
 			}),
@@ -183,6 +185,9 @@ export class SpawnerPacket {
 			}),
       ...(type === SpawnerPacketType.PROMPT_INJECTION && {
 				promptInjection: PromptInjectionEvent.convertProto(value as ProtoPromptInjectionEvent),
+			}),
+      ...(type === SpawnerPacketType.WORLD_CONTROLLER && {
+				worldController: WorldController.convertProto(value as ProtoWorldController),
 			}),
 		});
 	}
@@ -198,14 +203,14 @@ export class SpawnerPacket {
 				return SpawnerPacketType.KNOWLEDGE;
 			case ProtoSpawnerPacketType.INPUT_FILTER:
 				return SpawnerPacketType.INPUT_FILTER;
-			case ProtoSpawnerPacketType.SESSION_CONTROLLER:
-				return SpawnerPacketType.SESSION_CONTROLLER;
 			case ProtoSpawnerPacketType.CHANNEL_CONTROLLER:
 				return SpawnerPacketType.CHANNEL_CONTROLLER;
       case ProtoSpawnerPacketType.SENTIMENT:
         return SpawnerPacketType.SENTIMENT;
       case ProtoSpawnerPacketType.PROMPT_INJECTION:
         return SpawnerPacketType.PROMPT_INJECTION;
+      case ProtoSpawnerPacketType.WORLD:
+        return SpawnerPacketType.WORLD_CONTROLLER;
 			default:
 				return SpawnerPacketType.UNSPECIFIED;
 		}

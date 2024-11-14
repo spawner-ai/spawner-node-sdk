@@ -1,12 +1,12 @@
 import type { WritableIterable } from "@connectrpc/connect/protocol";
-import { create, toJson } from "@bufbuild/protobuf";
+import { create } from "@bufbuild/protobuf";
 import { FeatureConfigurationSchema } from "../../proto/spawner/main/v1/main_pb";
 import {
 	SpawnerPacket as ProtoPacket,
 	SpawnerPacketSchema,
 	SpawnerPacketType,
 } from "../../proto/spawner/packet/v1/packet_pb";
-import { EventActorType, EventCharacterSchema, EventPlayerSchema } from "../../proto/spawner/routing/v1/routing_pb";
+import { EventActorSchema, EventActorType, EventAgentSchema, EventPlayerSchema, RoutingSchema } from "../../proto/spawner/routing/v1/routing_pb";
 import type {
 	ApiKey,
 	ConnectionConfig,
@@ -15,22 +15,20 @@ import type {
 } from "../common/types";
 import { ConnectionState } from "../common/types";
 import { Channel } from "../entities/channel.entity";
-import type { Character } from "../entities/character.entity";
+import { Character } from "../entities/character.entity";
 import type { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
 import { Player } from "../entities/player.entity";
-import { Scene } from "../entities/scene.entity";
 import { SessionToken } from "../entities/session_token.entity";
 import { SpawnerMainService } from "./main-service";
-import { TextEvent } from "../entities/packets/text.entity";
 import { TextEventSchema } from "../../proto/spawner/text/v1/text_pb";
-
+import { World } from "../entities/world.entity";
 
 interface ConnectionProps {
 	config: ConnectionConfig;
 	apiKey: ApiKey;
 	workspaceId: string;
-	scene?: Scene;
 	player?: Player;
+  characters?: Character[];
 	sessionAccessor?: Accessor<SessionToken>;
 	onOpen?: () => void;
 	onError?: (err: ConnectionError) => void;
@@ -43,10 +41,9 @@ export class ConnectionService {
 	private stream!: WritableIterable<ProtoPacket>;
 	private state: ConnectionState = ConnectionState.INACTIVE;
 	private sessionToken!: SessionToken | undefined;
-	private scene: Scene | undefined;
 	private channel: Channel | undefined;
 	private players: Player[];
-	private characters: Character[] = [];
+  private world: World | undefined;
 
 	private onOpen: (() => void) | undefined;
 	private onError: ((err: ConnectionError) => void) | undefined;
@@ -102,29 +99,35 @@ export class ConnectionService {
 			this.connectionProps.sessionAccessor?.set(this.sessionToken);
 		}
 
-		const [stream, loadedScene] = await this.mainService.openSession({
+    if(!this.connectionProps.characters){
+      throw Error("The character to be given to the world is empty or undefined.")
+    }
+
+		const [stream, world] = await this.mainService.openSession({
 			sessionToken: this.sessionToken,
-			scene: this.connectionProps.scene,
+			characters: this.connectionProps.characters,
 			onMessage: this.onMessage,
 			onError: this.onError,
 			onClose: this.onClose,
 		});
 
-		this.scene = Scene.convertProto(loadedScene);
-		if (this.scene.characters) {
-			this.characters = this.scene.characters;
-		}
+    this.world = world;
+
 		this.stream = stream;
 		this.state = ConnectionState.ACTIVE;
 		console.log("Connection is active. You are ready to open the channel.");
 
-		const channel = await this.mainService.openChannel(
-			this.sessionToken,
-			this.players,
-			this.characters,
-		);
-
-		this.channel = Channel.convertProto(channel);
+    if(this.isActive()){
+      const characters = world.agents.map(agent => (
+        Character.convertProto(agent)
+      ))
+      const channel = await this.mainService.openChannel(
+        this.sessionToken,
+        this.players,
+        characters
+      );
+      this.channel = Channel.convertProto(channel);
+    }
 	}
 
 	close() {
@@ -158,22 +161,34 @@ export class ConnectionService {
       id: this.players[0].id,
     })
 
-    const eventCharacter = create(EventCharacterSchema, {
-      customId: this.characters[0].id,
+    const eventAgent = create(EventAgentSchema, {
+      id: this.world?.agents[0].id,
+    })
+
+    const source = create(EventActorSchema, {
+      type: EventActorType.PLAYER,
+      payload: {
+        case: "player",
+        value: eventPlayer
+      }
+    })
+
+    const target = create(EventActorSchema, {
+      type: EventActorType.AGENT,
+      payload: {
+        case: "agent",
+        value: eventAgent
+      }
+    })
+
+    const routing = create(RoutingSchema, {
+      source,
+      target
     })
 
 		const packet = create(SpawnerPacketSchema, {
       type: SpawnerPacketType.TEXT,
-			routing: {
-				source: {
-					type: EventActorType.PLAYER,
-					player: eventPlayer
-				},
-				target: {
-					type: EventActorType.CHARACTER,
-					character: eventCharacter
-				},
-			},
+			routing,
 			payload: {
 				case: "text",
 				value: textEvent,
@@ -234,7 +249,7 @@ export class ConnectionService {
 		}
 
 		if (!this.sessionToken) {
-			throw Error("Session token is null.");
+			throw Error("Session token is undefined.");
 		}
 	}
 }

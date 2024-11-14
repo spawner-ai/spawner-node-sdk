@@ -19,10 +19,10 @@ export class Actor {
 	}
 
 	static convertProto(proto: ProtoActor) {
-		const { players, characters } = proto;
+		const { players, agents } = proto;
 		return new Actor({
 			players: players.map((p) => Player.convertProto(p)),
-			characters: characters.map((c) => Character.convertProto(c)),
+			characters: agents.map((c) => Character.convertProto(c)),
 		});
 	}
 }

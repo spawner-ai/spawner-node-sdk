@@ -52,7 +52,7 @@ export class Channel {
 			members: members.map((member) => ({ sessionId: member.sessionId })),
 			actor: {
 				players: actor?.players.map((player) => Player.convertProto(player)) ?? [],
-				characters: actor?.characters.map((character) => Character.convertProto(character)) ?? [],
+				characters: actor?.agents.map((agent) => Character.convertProto(agent)) ?? [],
 			},
 		});
 	}

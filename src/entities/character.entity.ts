@@ -1,41 +1,61 @@
-import { CharacterActor } from "../../proto/spawner/actor/v1/actor_pb";
-import type { SceneCharacter } from "../../proto/spawner/scene/v1/scene_pb";
+import { AgentConfiguration } from "../../proto/spawner/world/v1/world_pb";
+import { AgentFunction } from "../../proto/spawner/world/v1/world_pb";
+import { AgentActor } from "../../proto/spawner/actor/v1/actor_pb";
+
+interface Agent {
+  id: string;
+  blueprintId?: string;
+  displayName?: string;
+  functions?: AgentFunction[];
+  objective?: string;
+}
 
 export interface CharacterProps {
-	id: string;
-	displayName?: string;
+	customId?: string;
+  name?: string;
+  agent?: Agent;
 }
 
 export class Character {
-	readonly id: string;
-	readonly displayName?: string;
+	readonly customId?: string;
+  readonly name?: string;
+  readonly agent?: Agent;
 
 	constructor(props: CharacterProps) {
-		const { id, displayName } = props;
-		this.id = id;
-		this.displayName = displayName;
+		const { customId, name, agent } = props;
+		this.customId = customId;
+    this.name = name;
+    this.agent = agent;
 	}
 
-  private static isCharacterActor(proto: any): proto is CharacterActor {
-    return (
-        proto &&
-        typeof proto.name === "string" &&
-        typeof proto.displayName === "string" &&
-        typeof proto.customId === "string"
-    );
+  private static isAgentConfiguration(proto: AgentConfiguration | AgentActor): proto is AgentConfiguration {
+    return (proto as AgentConfiguration).blueprintId !== undefined;
   }
 
-	static convertProto(proto: SceneCharacter | CharacterActor) {
-		if (this.isCharacterActor(proto)) {
-			const { displayName, customId } = proto;
+	static convertProto(proto: AgentConfiguration | AgentActor) {
+    if(this.isAgentConfiguration(proto)){
+      const { id, blueprintId, displayName, character, functions, objective } = proto;
+      if(!character?.customId){
+        throw Error("Character custom id is undefined.")
+      }
 			return new Character({
-				id: customId,
-				displayName,
+				customId: character?.customId,
+        name: character.name,
+        agent: {
+          id,
+          blueprintId,
+          displayName,
+          functions,
+          objective
+        }
 			});
-		}
-		const { customId } = proto;
-		return new Character({
-			id: customId,
-		});
+    } else {
+      const { id } = proto;
+      return new Character({
+        agent: {
+          id
+        }
+      })
+    }	
 	}
 }

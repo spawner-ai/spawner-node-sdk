@@ -3,17 +3,17 @@ import type { ApiKey, ConnectionConfig, Gateway, Accessor } from "../common/type
 import type { ConnectionError } from "../common/types";
 import type { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
 import type { Player } from "../entities/player.entity";
-import type { Scene } from "../entities/scene.entity";
 import { ConnectionService } from "../services/connection-service";
 import type { SessionToken } from "../entities/session_token.entity";
 import type { FeatureConfiguration } from "../common/types";
+import { Character } from "../entities/character.entity";
 
 export class SpawnerClient {
 	private config: ConnectionConfig = {};
 	private apiKey: ApiKey | undefined;
 	private workspaceId: string | undefined;
-	private scene: Scene | undefined;
 	private player: Player | undefined;
+  private characters: Character[] | undefined;
   private sessionAccessor: Accessor<SessionToken> | undefined;
 	private onOpen: (() => void) | undefined;
 	private onError: ((err: ConnectionError) => void) | undefined;
@@ -29,8 +29,8 @@ export class SpawnerClient {
 			apiKey: this.apiKey!,
 			workspaceId: this.workspaceId!,
       sessionAccessor: this.sessionAccessor,
-			scene: this.scene,
 			player: this.player,
+      characters: this.characters,
 			onOpen: this.onOpen,
 			onError: this.onError,
 			onMessage: this.onMessage,
@@ -78,16 +78,15 @@ export class SpawnerClient {
 		return this;
 	}
 
-	setScene(scene: Scene) {
-		this.scene = scene;
-
-		return this;
-	}
-
 	setPlayer(player: Player) {
 		this.player = player;
 		return this;
 	}
+
+  setCharacters(characters: Character[]) {
+    this.characters = characters;
+    return this;
+  }
 
 	private ensureGateway(gateway?: Gateway) {
 		const hostname = gateway?.hostname ?? GRPC_HOSTNAME;

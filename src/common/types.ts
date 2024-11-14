@@ -51,11 +51,17 @@ export interface ConnectionConfig {
 export type ConnectionError = Error | Event | PacketError | unknown;
 
 export type MainServiceType = GenService<{
+  /**
+   * Generates a JWT to access the API with a given API key and secret.
+   * Initializes session record and loads workspace data to Redis.
+   *
+   * @generated from rpc spawner.main.v1.MainService.GenerateSessionToken
+   */
   generateSessionToken: {
     methodKind: "unary";
     input: typeof GenerateSessionTokenRequestSchema;
     output: typeof GenerateSessionTokenResponseSchema;
-  };
+  },
   /**
    * Returns session token from a refresh token.
    *
@@ -65,7 +71,7 @@ export type MainServiceType = GenService<{
     methodKind: "unary";
     input: typeof RefreshSessionTokenRequestSchema;
     output: typeof RefreshSessionTokenResponseSchema;
-  };
+  },
   /**
    * Gets session for passed identifier.
    *
@@ -75,17 +81,28 @@ export type MainServiceType = GenService<{
     methodKind: "unary";
     input: typeof GetSessionRequestSchema;
     output: typeof GetSessionResponseSchema;
-  };
+  },
   /**
-   * Loads scene to a session. Accepts adhoc scenes.
+   * Deprecated. Loads scene to a session. Accepts adhoc scenes.
    *
    * @generated from rpc spawner.main.v1.MainService.LoadScene
+   * @deprecated
    */
   loadScene: {
     methodKind: "unary";
     input: typeof SpawnerPacketSchema;
     output: typeof SpawnerPacketSchema;
-  };
+  },
+  /**
+   * Create a world initialized with agents.
+   *
+   * @generated from rpc spawner.main.v1.MainService.CreateWorld
+   */
+  createWorld: {
+    methodKind: "unary";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  },
   /**
    * Handles session specific processes.
    *
@@ -95,7 +112,7 @@ export type MainServiceType = GenService<{
     methodKind: "bidi_streaming";
     input: typeof SpawnerPacketSchema;
     output: typeof SpawnerPacketSchema;
-  };
+  },
   /**
    * Opens a channel with initial values.
    *
@@ -105,7 +122,7 @@ export type MainServiceType = GenService<{
     methodKind: "unary";
     input: typeof SpawnerPacketSchema;
     output: typeof SpawnerPacketSchema;
-  };
+  },
   /**
    * Leaves current channel the session is subscribed to.
    *
@@ -115,5 +132,5 @@ export type MainServiceType = GenService<{
     methodKind: "unary";
     input: typeof LeaveChannelRequestSchema;
     output: typeof LeaveChannelResponseSchema;
-  };
+  },
 }>
