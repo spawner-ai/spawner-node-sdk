@@ -80,7 +80,7 @@ export class ConnectionService {
 		});
 	}
 
-	async open() {
+	async open(world?: World): Promise<World | void> {
 		if (this.state !== ConnectionState.INACTIVE) return;
 
 		this.state = ConnectionState.ACTIVATING;
@@ -93,42 +93,60 @@ export class ConnectionService {
 		const prevSessionToken = this.sessionToken;
 		await this.ensureSessionToken(session);
 
-		if (!this.sessionToken) return;
+    if(!this.sessionToken) {
+      throw Error("Something went wrong and the session token could not be passed or generated.")
+    }
 
 		if (prevSessionToken !== this.sessionToken) {
 			this.connectionProps.sessionAccessor?.set(this.sessionToken);
 		}
 
-    if(!this.connectionProps.characters){
-      throw Error("The character to be given to the world is empty or undefined.")
+    let stream: WritableIterable<ProtoPacket>;
+
+    if(!world){
+      if(!this.connectionProps.characters){
+        throw Error("The character to be given to the world is empty or undefined.")
+      }
+      const createdWorld = await this.mainService.createWorld({
+        sessionToken: this.sessionToken,
+        characters: this.connectionProps.characters
+      })
+      this.world = createdWorld;
+    } else {
+      const loadWorld = await this.mainService.LoadWorld({
+        sessionToken: this.sessionToken,
+        worldId: world.id
+      });
+      this.world = loadWorld;
     }
 
-		const [stream, world] = await this.mainService.openSession({
-			sessionToken: this.sessionToken,
-			characters: this.connectionProps.characters,
-			onMessage: this.onMessage,
-			onError: this.onError,
-			onClose: this.onClose,
-		});
-
-    this.world = world;
+      stream = await this.mainService.openSession({
+        sessionToken: this.sessionToken,
+        onMessage: this.onMessage,
+        onError: this.onError,
+        onClose: this.onClose,
+      });  
 
 		this.stream = stream;
 		this.state = ConnectionState.ACTIVE;
 		console.log("Connection is active. You are ready to open the channel.");
 
-    if(this.isActive()){
-      const characters = world.agents.map(agent => (
-        Character.convertProto(agent)
-      ))
-      const channel = await this.mainService.openChannel(
-        this.sessionToken,
-        this.players,
-        characters
-      );
-      this.channel = Channel.convertProto(channel);
-    }
+    return this.world;
 	}
+
+  async startInteraction(characters: Character[]) {
+    if(!this.isActive()){
+      throw Error("Connection is inactive. Connection is must be active to start interaction.")
+    }
+    const sessionToken = await this.ensureSessionToken(this.sessionToken);
+    const channel = await this.mainService.openChannel(
+      sessionToken,
+      this.players,
+      characters
+    );
+    
+    return channel
+  }
 
 	close() {
 		this.state = ConnectionState.INACTIVE;
@@ -149,11 +167,18 @@ export class ConnectionService {
 		return this.state;
 	}
 
+  getCharacters() {
+    if(!this.world){
+      throw Error("World is not exist. Open connection to create or assign the world to the session.")
+    }
+    return this.world?.characters;
+  }
+
 	async sendText(text: string) {
 		this.validate();
 
 		const textEvent = create(TextEventSchema, {
-			utteranceId: "utterance_id",
+			utteranceId: this.generateUtteranceId(),
 			text,
 		});
 
@@ -162,7 +187,7 @@ export class ConnectionService {
     })
 
     const eventAgent = create(EventAgentSchema, {
-      id: this.world?.agents[0].id,
+      id: this.world?.characters[0].agent?.id,
     })
 
     const source = create(EventActorSchema, {
@@ -201,15 +226,15 @@ export class ConnectionService {
 	async generateSessionToken() {
 		const { feature } = this.connectionProps.config
     const featureConfiguration = create(FeatureConfigurationSchema, feature)
-		const protoSession = await this.mainService.generateSessionToken({
+    
+    const sessionToken = await this.mainService.generateSessionToken({
 			apiKey: this.connectionProps.apiKey.key,
 			apiSecret: this.connectionProps.apiKey.secret,
 			workspaceId: this.connectionProps.workspaceId,
 			playerId: this.players[0].id,
-			featureConfiguration,
+			featureConfiguration
 		});
 
-		const sessionToken = SessionToken.convertProto(protoSession);
 		this.sessionToken = sessionToken;
 		return sessionToken;
 	}
@@ -218,7 +243,7 @@ export class ConnectionService {
 		let sessionToken = session ?? this.sessionToken;
 
 		if (!sessionToken || SessionToken.isExpired(sessionToken)) {
-			sessionToken = await this.generateSessionToken();
+      sessionToken = await this.generateSessionToken();
 		}
 
 		this.sessionToken = sessionToken;
@@ -238,6 +263,19 @@ export class ConnectionService {
 		}
 		return this.players;
 	}
+
+  private generateUtteranceId(){
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const length = 12;
+    let result = '';
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters[randomIndex];
+    }
+
+    return result;
+  }
 
 	private validate() {
 		if (!this.stream) {

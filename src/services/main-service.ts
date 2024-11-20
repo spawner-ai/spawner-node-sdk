@@ -6,7 +6,7 @@ import { create } from "@bufbuild/protobuf";
 import { GenerateSessionTokenRequestSchema, MainService } from "../../proto/spawner/main/v1/main_pb";
 import { MainServiceType } from "../common/types";
 import { type FeatureConfiguration } from "../../proto/spawner/main/v1/main_pb";
-import { SpawnerPacketSchema, SpawnerPacket as ProtoPacket, SpawnerPacketType } from "../../proto/spawner/packet/v1/packet_pb";
+import { SpawnerPacketSchema, SpawnerPacket as ProtoPacket, SpawnerPacketType, SpawnerPacketTypeSchema } from "../../proto/spawner/packet/v1/packet_pb";
 import type { ConnectionConfig } from "../common/types";
 import { ActorSchema, AgentActorSchema, PlayerActorSchema } from "../../proto/spawner/actor/v1/actor_pb";
 import {
@@ -17,19 +17,19 @@ import {
 	ChannelMemberSchema,
 } from "../../proto/spawner/channel/v1/channel_pb";
 import { LanguageCode } from "../../proto/spawner/language_code/v1/language_code_pb";
-import { CreateWorldEventSchema, WorldControllerSchema, WorldControllerType, WorldController, CreateWorldEvent, AgentConfigurationSchema, AgentCharacterSchema } from "../../proto/spawner/world/v1/world_pb";
+import { CreateWorldEventSchema, WorldControllerSchema, WorldControllerType, WorldController, CreateWorldEvent, AgentConfigurationSchema, AgentCharacterSchema, LoadWorldEventSchema, LoadWorldEvent } from "../../proto/spawner/world/v1/world_pb";
 
 import type { ConnectionError } from "../common/types";
 import type { Character } from "../entities/character.entity";
 import { PacketError } from "../entities/packets/error.entity";
 import { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
 import type { Player } from "../entities/player.entity";
-import type { SessionToken } from "../entities/session_token.entity";
+import { SessionToken } from "../entities/session_token.entity";
 import { World } from "../entities/world.entity";
+import { Channel } from "../entities/channel.entity";
 
 interface OpenSessionProps {
 	sessionToken: SessionToken;
-	characters: Character[];
 	onError: ((err: ConnectionError) => void) | undefined;
 	onMessage: ((packet: SpawnerPacket) => void) | undefined;
 	onClose: (() => void) | undefined;
@@ -45,6 +45,17 @@ interface GenerateSessionTokenProps {
 	workspaceId: string;
 	playerId: string;
 	featureConfiguration: FeatureConfiguration;
+  worldId?: string;
+}
+
+interface CreateWorldProps {
+  sessionToken: SessionToken;
+  characters: Character[];
+}
+
+interface LoadWorldProps {
+  sessionToken: SessionToken;
+  worldId: string;
 }
 
 export class SpawnerMainService {
@@ -58,29 +69,23 @@ export class SpawnerMainService {
 	}
 
 	private createClient() {
-		const { hostname } = this.config.gateway!;
+		const { hostname, ssl } = this.config.gateway!;
 		const client = createPromiseClient(
 			MainService,
 			createGrpcTransport({
 				httpVersion: "2",
-				baseUrl: `http://${hostname}`,
+				baseUrl: `${ssl ? `https` : `http`}://${hostname}`,
 			}),
 		);
 		return client;
 	}
 
-	async openSession(props: OpenSessionProps): Promise<[WritableIterable<ProtoPacket>, World]> {
-		const { sessionToken, characters, onMessage, onError, onClose } = props;
+	async openSession(props: OpenSessionProps): Promise<WritableIterable<ProtoPacket>> {
+		const { sessionToken, onMessage, onError, onClose } = props;
 
 		const connection = createWritableIterable<ProtoPacket>();
 		const options = this.getOptions(sessionToken);
 		const responses = this.client.connectSession(connection, options);
-
-    // deprecated function
-		// const loadedScene = await this.loadScene(sessionToken, scene);
-    
-    const createdWorld = await this.createWorld(sessionToken, characters);
-    const world = World.convertProto(createdWorld)
 
 		const processResponses = async () => {
 			try {
@@ -101,12 +106,11 @@ export class SpawnerMainService {
 
 		processResponses();
 
-		return Promise.resolve([connection, world]);
+		return Promise.resolve(connection);
 	}
 
-	async openChannel(sessionToken: SessionToken, players: Player[], characters: Character[]) {
+	async openChannel(sessionToken: SessionToken, players: Player[], characters: Character[]): Promise<Channel> {
 
-    console.log('characters:',characters)
     const host = create(ChannelHostSchema, {
       sessionId: sessionToken.sessionId,
     });
@@ -147,8 +151,9 @@ export class SpawnerMainService {
 
 		const channelPacket = await this.client.openChannel(packet, options);
 
-		const channel = channelPacket.payload.value as ChannelController;
-    console.log('channel',channel.actor?.agents)
+		const protoChannel = channelPacket.payload.value as ChannelController;
+
+    const channel = Channel.convertProto(protoChannel);
 		return channel;
 	}
 
@@ -159,15 +164,18 @@ export class SpawnerMainService {
 			workspaceId: props.workspaceId,
 			playerId: props.playerId,
 			featureConfiguration: props.featureConfiguration,
-			languageCode: LanguageCode.JA,
+			languageCode: LanguageCode.JA
     });
 
-		const sessionToken = await this.client.generateSessionToken(generateSessionTokenRequest);
+		const protoSessionToken = await this.client.generateSessionToken(generateSessionTokenRequest);
+
+    const sessionToken = SessionToken.convertProto(protoSessionToken);
 
 		return sessionToken;
 	}
 
-  async createWorld(sessionToken: SessionToken, characters: Character[]){
+  async createWorld(props: CreateWorldProps){
+    const { sessionToken, characters} = props
     if (!sessionToken.token) {
 			throw Error("Session token is not valid. Generate a session token before creating world.");
 		}
@@ -180,7 +188,6 @@ export class SpawnerMainService {
         character: create(AgentCharacterSchema, {
           customId: c.customId
         }),
-        functions: c.agent?.functions,
         objective: c.agent?.objective
       })
     )
@@ -200,7 +207,7 @@ export class SpawnerMainService {
     })
 
     const packet = create(SpawnerPacketSchema, {
-      type: SpawnerPacketType.WORLD,
+      type: SpawnerPacketType.WORLD_CONTROLLER,
       payload: {
         case: "worldController",
         value: worldController
@@ -209,12 +216,43 @@ export class SpawnerMainService {
 
     const options = this.getOptions(sessionToken);
     const worldPacket = await this.client.createWorld(packet, options);
-    console.log(worldPacket)
     const packetWorldController = worldPacket.payload.value as WorldController
-    console.log(packetWorldController)
     const createdWorld = packetWorldController.payload.value as CreateWorldEvent
 
-    return createdWorld
+    const world = World.convertProto(createdWorld)
+    return world
+  }
+
+  async LoadWorld(props: LoadWorldProps) {
+    const { worldId, sessionToken } = props;
+
+    const loadWorldEvent = create(LoadWorldEventSchema, {
+      worldId
+    })
+
+    const worldController = create(WorldControllerSchema, {
+      type: WorldControllerType.LOAD,
+      payload: {
+        value: loadWorldEvent,
+        case: "load"
+      }
+    })
+
+    const loadWorldRequest = create(SpawnerPacketSchema, {
+      type: SpawnerPacketType.WORLD_CONTROLLER,
+      payload: {
+        case: "worldController",
+        value: worldController
+      }
+    })
+
+    const options = this.getOptions(sessionToken);
+    const worldPacket = await this.client.loadWorld(loadWorldRequest, options)
+
+    const packetWorldController = worldPacket.payload.value as WorldController
+    const loadWorld = packetWorldController.payload.value as LoadWorldEvent
+    const world = World.convertProto(loadWorld)
+    return world
   }
 
   private getOptions(sessionToken: SessionToken) {
@@ -226,40 +264,4 @@ export class SpawnerMainService {
 		};
 		return options;
 	}
-
-  // deprecated
-	// async loadScene(sessionToken: SessionToken, scene?: Scene) {
-	// 	if (!sessionToken.token) {
-	// 		throw Error("Session token is not valid. Generate a session token before loading scene.");
-	// 	}
-
-  //   const protoScene = create(ProtoSceneSchema, {
-  //     customId: scene?.id,
-	// 		description: scene?.description,
-  //   })
-
-  //   const sessionController = create(SessionControllerSchema, {
-  //     type: SessionControllerType.LOAD,
-	// 		payload: {
-	// 			value: protoScene,
-	// 			case: "scene",
-	// 		},
-  //   })
-
-  //   const packet = create(SpawnerPacketSchema, {
-  //     type: SpawnerPacketType.SESSION_CONTROLLER,
-	// 		payload: {
-	// 			case: "sessionController",
-	// 			value: sessionController,
-	// 		},
-  //   })
-
-	// 	const options = this.getOptions(sessionToken);
-
-	// 	const loadedScenePacket = await this.client.loadScene(packet, options);
-
-	// 	const loadSceneSessionController = loadedScenePacket.payload.value as SessionController;
-	// 	const loadedScene = loadSceneSessionController.payload.value as ProtoScene;
-	// 	return loadedScene;
-	// }
 }
