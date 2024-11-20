@@ -48,24 +48,23 @@ export const MainService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Deprecated. Loads scene to a session. Accepts adhoc scenes.
-     *
-     * @generated from rpc spawner.main.v1.MainService.LoadScene
-     * @deprecated
-     */
-    loadScene: {
-      name: "LoadScene",
-      I: SpawnerPacket,
-      O: SpawnerPacket,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Create a world initialized with agents.
      *
      * @generated from rpc spawner.main.v1.MainService.CreateWorld
      */
     createWorld: {
       name: "CreateWorld",
+      I: SpawnerPacket,
+      O: SpawnerPacket,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Loads world on current session.
+     *
+     * @generated from rpc spawner.main.v1.MainService.LoadWorld
+     */
+    loadWorld: {
+      name: "LoadWorld",
       I: SpawnerPacket,
       O: SpawnerPacket,
       kind: MethodKind.Unary,
@@ -80,6 +79,19 @@ export const MainService = {
       I: SpawnerPacket,
       O: SpawnerPacket,
       kind: MethodKind.BiDiStreaming,
+    },
+    /**
+     * Handles session specific processes for server streaming. For example,
+     * browsers (which don't support bidirectional streaming) should use this rpc
+     * instead.
+     *
+     * @generated from rpc spawner.main.v1.MainService.ConnectSessionServerStreaming
+     */
+    connectSessionServerStreaming: {
+      name: "ConnectSessionServerStreaming",
+      I: SpawnerPacket,
+      O: SpawnerPacket,
+      kind: MethodKind.ServerStreaming,
     },
     /**
      * Opens a channel with initial values.
