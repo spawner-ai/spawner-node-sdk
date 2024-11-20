@@ -1,5 +1,5 @@
-import { GRPC_HOSTNAME } from "../common/config";
-import type { ApiKey, ConnectionConfig, Gateway, Accessor } from "../common/types";
+import { GRPC_HOSTNAME, DEFAULT_DISCONNECT_TIMEOUT } from "../common/config";
+import type { ApiKey, ConnectionConfig, AutoConnectConfig, Gateway, Accessor } from "../common/types";
 import type { ConnectionError } from "../common/types";
 import type { SpawnerPacket } from "../entities/packets/spawner_packet.entity";
 import type { Player } from "../entities/player.entity";
@@ -56,7 +56,8 @@ export class SpawnerClient {
 	private ensureConfig() {
 		const gateway: Gateway = this.ensureGateway(this.config?.gateway);
     const feature: FeatureConfiguration = this.ensureFeature(this.config?.feature);
-		const config: ConnectionConfig = { gateway, feature };
+    const autoConnect: AutoConnectConfig = this.ensureAutoConnectConfig(this.config?.autoConnect)
+		const config: ConnectionConfig = { gateway, autoConnect,feature };
 		return config;
 	}
 
@@ -88,21 +89,33 @@ export class SpawnerClient {
     return this;
   }
 
+  public setSessionAccessor(props: Accessor<SessionToken>) {
+    this.sessionAccessor = props;
+
+    return this;
+  }
+
 	private ensureGateway(gateway?: Gateway) {
 		const hostname = gateway?.hostname ?? GRPC_HOSTNAME;
 		const ssl = gateway?.ssl ?? true;
 		return { hostname, ssl };
 	}
 
-  private ensureFeature(feature?: FeatureConfiguration) {
-    return feature ??
-     {
-      emotion: false,
-      inputFilter: false,
-      command: false,
-      memory: false,
-      reasoning: false
+  private ensureAutoConnectConfig(autoConnect?: AutoConnectConfig) {
+    return {
+      autoReconnect: autoConnect?.autoReconnect ?? false,
+      disconnectTimeout: autoConnect?.disconnectTimeout ?? DEFAULT_DISCONNECT_TIMEOUT
     }
+  }
+
+  private ensureFeature(feature?: FeatureConfiguration) {
+    return {
+      emotion: feature?.emotion ?? false,
+      inputFilter: feature?.inputFilter ?? false,
+      command: feature?.command ?? false,
+      memory: feature?.memory ?? false,
+      reasoning: feature?.reasoning ?? false,
+    };
   }
 
 	public setOnOpen(fn: () => void) {
@@ -128,12 +141,6 @@ export class SpawnerClient {
 
 		return this;
 	}
-
-  public setSessionAccessor(props: Accessor<SessionToken>) {
-    this.sessionAccessor = props;
-
-    return this;
-  }
 
 	private validate() {
 		if (!this.apiKey?.key || !this.apiKey.secret) {
