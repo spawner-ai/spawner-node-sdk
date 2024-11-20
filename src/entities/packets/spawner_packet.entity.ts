@@ -209,7 +209,7 @@ export class SpawnerPacket {
         return SpawnerPacketType.SENTIMENT;
       case ProtoSpawnerPacketType.PROMPT_INJECTION:
         return SpawnerPacketType.PROMPT_INJECTION;
-      case ProtoSpawnerPacketType.WORLD:
+      case ProtoSpawnerPacketType.WORLD_CONTROLLER:
         return SpawnerPacketType.WORLD_CONTROLLER;
 			default:
 				return SpawnerPacketType.UNSPECIFIED;

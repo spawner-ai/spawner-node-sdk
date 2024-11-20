@@ -1,40 +1,31 @@
-import { CreateWorldEvent, WorldController as ProtoWorldController, WorldControllerType as ProtoWorldControllerType } from "../../../proto/spawner/world/v1/world_pb";
-import { ObservationEvent } from "../../../proto/spawner/observation/v1/observation_pb";
-import { PlanEvent } from "../../../proto/spawner/plan/v1/plan_pb";
+import { CreateWorldEvent, LoadWorldEvent, WorldController as ProtoWorldController, WorldControllerType as ProtoWorldControllerType } from "../../../proto/spawner/world/v1/world_pb";
 
 enum WorldControllerType {
 	UNSPECIFIED = "UNSPECIFIED",
 	CREATE = "CREATE",
-	OBSERVATION = "OBSERVATION",
-  PLAN = "PLAN"
+	LOAD = "LOAD"
 }
 
 interface WorldControllerProps {
 	type: WorldControllerType;
 	create?: CreateWorldEvent;
-	observation?: ObservationEvent;
-  plan?: PlanEvent;
+  load?: LoadWorldEvent; 
 }
 
 export class WorldController {
   readonly type: WorldControllerType = WorldControllerType.UNSPECIFIED;
   readonly create?: CreateWorldEvent;
-  readonly observation?: ObservationEvent;
-  readonly plan?: PlanEvent;
+  readonly load?: LoadWorldEvent;
 
   constructor(props: WorldControllerProps) {
-    const { type } = props
+    const { type } = props;
 
     if(type === WorldControllerType.CREATE){
-      this.create = props.create
+      this.create = props.create;
     }
     
-    if(type === WorldControllerType.OBSERVATION){
-      this.observation = props.observation
-    }
-
-    if(type === WorldControllerType.PLAN){
-      this.plan = props.plan
+    if(type === WorldControllerType.LOAD){
+      this.load = props.load;
     }
   }
 
@@ -48,11 +39,8 @@ export class WorldController {
       ...(type === WorldControllerType.CREATE && {
 				create: value as CreateWorldEvent,
 			}),
-      ...(type === WorldControllerType.OBSERVATION && {
-				observation: value as ObservationEvent,
-			}),
-      ...(type === WorldControllerType.PLAN && {
-				plan: value as PlanEvent,
+      ...(type === WorldControllerType.LOAD && {
+				load: value as LoadWorldEvent,
 			})
     })
   }
@@ -62,10 +50,8 @@ export class WorldController {
 		switch (type) {
 			case ProtoWorldControllerType.CREATE:
 				return WorldControllerType.CREATE;
-			case ProtoWorldControllerType.OBSERVATION:
-				return WorldControllerType.OBSERVATION;
-      case ProtoWorldControllerType.PLAN:
-				return WorldControllerType.PLAN;
+			case ProtoWorldControllerType.LOAD:
+				return WorldControllerType.LOAD;
 			default:
 				return WorldControllerType.UNSPECIFIED;
 		}

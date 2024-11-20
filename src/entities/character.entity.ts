@@ -1,12 +1,10 @@
 import { AgentConfiguration } from "../../proto/spawner/world/v1/world_pb";
-import { AgentFunction } from "../../proto/spawner/world/v1/world_pb";
 import { AgentActor } from "../../proto/spawner/actor/v1/actor_pb";
 
 interface Agent {
   id: string;
   blueprintId?: string;
   displayName?: string;
-  functions?: AgentFunction[];
   objective?: string;
 }
 
@@ -34,7 +32,7 @@ export class Character {
 
 	static convertProto(proto: AgentConfiguration | AgentActor) {
     if(this.isAgentConfiguration(proto)){
-      const { id, blueprintId, displayName, character, functions, objective } = proto;
+      const { id, blueprintId, displayName, character, objective } = proto;
       if(!character?.customId){
         throw Error("Character custom id is undefined.")
       }
@@ -45,7 +43,6 @@ export class Character {
           id,
           blueprintId,
           displayName,
-          functions,
           objective
         }
 			});
