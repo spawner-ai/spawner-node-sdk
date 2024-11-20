@@ -8,7 +8,7 @@ import {
   GetSessionRequestSchema,
   GetSessionResponseSchema,
   LeaveChannelRequestSchema,
-  LeaveChannelResponseSchema
+  LeaveChannelResponseSchema,
  } from "../../proto/spawner/main/v1/main_pb";
  import type { SpawnerPacketSchema } from "../../proto/spawner/packet/v1/packet_pb"
 import type { PacketError } from "../entities/packets/error.entity";
@@ -23,11 +23,11 @@ export interface Gateway {
 	ssl?: boolean;
 }
 export interface FeatureConfiguration {
-  emotion: boolean,
-  inputFilter: boolean,
-  command: boolean,
-  memory: boolean,
-  reasoning: boolean
+  emotion?: boolean,
+  inputFilter?: boolean,
+  command?: boolean,
+  memory?: boolean,
+  reasoning?: boolean
 }
 
 export enum ConnectionState {
@@ -43,8 +43,14 @@ export interface Accessor<T> {
   set: (content: T) => Awaitable<void>;
 }
 
+export interface AutoConnectConfig {
+  autoReconnect?: boolean;
+  disconnectTimeout?: number;
+}
+
 export interface ConnectionConfig {
 	gateway?: Gateway;
+  autoConnect?: AutoConnectConfig;
   feature?: FeatureConfiguration;
 }
 
@@ -83,22 +89,21 @@ export type MainServiceType = GenService<{
     output: typeof GetSessionResponseSchema;
   },
   /**
-   * Deprecated. Loads scene to a session. Accepts adhoc scenes.
-   *
-   * @generated from rpc spawner.main.v1.MainService.LoadScene
-   * @deprecated
-   */
-  loadScene: {
-    methodKind: "unary";
-    input: typeof SpawnerPacketSchema;
-    output: typeof SpawnerPacketSchema;
-  },
-  /**
    * Create a world initialized with agents.
    *
    * @generated from rpc spawner.main.v1.MainService.CreateWorld
    */
   createWorld: {
+    methodKind: "unary";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  },
+  /**
+   * Loads world on current session.
+   *
+   * @generated from rpc spawner.main.v1.MainService.LoadWorld
+   */
+  loadWorld: {
     methodKind: "unary";
     input: typeof SpawnerPacketSchema;
     output: typeof SpawnerPacketSchema;
@@ -110,6 +115,18 @@ export type MainServiceType = GenService<{
    */
   connectSession: {
     methodKind: "bidi_streaming";
+    input: typeof SpawnerPacketSchema;
+    output: typeof SpawnerPacketSchema;
+  },
+  /**
+   * Handles session specific processes for server streaming. For example,
+   * browsers (which don't support bidirectional streaming) should use this rpc
+   * instead.
+   *
+   * @generated from rpc spawner.main.v1.MainService.ConnectSessionServerStreaming
+   */
+  connectSessionServerStreaming: {
+    methodKind: "server_streaming";
     input: typeof SpawnerPacketSchema;
     output: typeof SpawnerPacketSchema;
   },
