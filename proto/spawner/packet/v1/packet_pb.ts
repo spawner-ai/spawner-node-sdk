@@ -6,6 +6,8 @@ import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1"
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+import type { AgentEvent } from "../../agent/v1/agent_pb";
+import { file_spawner_agent_v1_agent } from "../../agent/v1/agent_pb";
 import type { ChannelController } from "../../channel/v1/channel_pb";
 import { file_spawner_channel_v1_channel } from "../../channel/v1/channel_pb";
 import type { EmotionEvent } from "../../emotion/v1/emotion_pb";
@@ -22,8 +24,6 @@ import type { Routing } from "../../routing/v1/routing_pb";
 import { file_spawner_routing_v1_routing } from "../../routing/v1/routing_pb";
 import type { SentimentEvent } from "../../sentiment/v1/sentiment_pb";
 import { file_spawner_sentiment_v1_sentiment } from "../../sentiment/v1/sentiment_pb";
-import type { SessionController } from "../../session/v1/session_pb";
-import { file_spawner_session_v1_session } from "../../session/v1/session_pb";
 import type { TextEvent } from "../../text/v1/text_pb";
 import { file_spawner_text_v1_text } from "../../text/v1/text_pb";
 import type { WorldController } from "../../world/v1/world_pb";
@@ -34,7 +34,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file spawner/packet/v1/packet.proto.
  */
 export const file_spawner_packet_v1_packet: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zcGF3bmVyL3BhY2tldC92MS9wYWNrZXQucHJvdG8SEXNwYXduZXIucGFja2V0LnYxIp8GCg1TcGF3bmVyUGFja2V0Ei0KCXRpbWVzdGFtcBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMgoEdHlwZRgCIAEoDjIkLnNwYXduZXIucGFja2V0LnYxLlNwYXduZXJQYWNrZXRUeXBlEiwKB3JvdXRpbmcYAyABKAsyGy5zcGF3bmVyLnJvdXRpbmcudjEuUm91dGluZxIPCgdzdWNjZXNzGAQgASgIEisKBWVycm9yGAUgASgLMhwuc3Bhd25lci5lcnJvci52MS5FcnJvckV2ZW50EkcKEnNlc3Npb25fY29udHJvbGxlchgGIAEoCzIlLnNwYXduZXIuc2Vzc2lvbi52MS5TZXNzaW9uQ29udHJvbGxlckICGAFIABJDChJjaGFubmVsX2NvbnRyb2xsZXIYByABKAsyJS5zcGF3bmVyLmNoYW5uZWwudjEuQ2hhbm5lbENvbnRyb2xsZXJIABIqCgR0ZXh0GAggASgLMhouc3Bhd25lci50ZXh0LnYxLlRleHRFdmVudEgAEkEKDGlucHV0X2ZpbHRlchgJIAEoCzIpLnNwYXduZXIuaW5wdXRfZmlsdGVyLnYxLklucHV0RmlsdGVyRXZlbnRIABIzCgdlbW90aW9uGAogASgLMiAuc3Bhd25lci5lbW90aW9uLnYxLkVtb3Rpb25FdmVudEgAEjkKCWtub3dsZWRnZRgLIAEoCzIkLnNwYXduZXIua25vd2xlZGdlLnYxLktub3dsZWRnZUV2ZW50SAASOQoJc2VudGltZW50GAwgASgLMiQuc3Bhd25lci5zZW50aW1lbnQudjEuU2VudGltZW50RXZlbnRIABJNChBwcm9tcHRfaW5qZWN0aW9uGA0gASgLMjEuc3Bhd25lci5wcm9tcHRfaW5qZWN0aW9uLnYxLlByb21wdEluamVjdGlvbkV2ZW50SAASPQoQd29ybGRfY29udHJvbGxlchgOIAEoCzIhLnNwYXduZXIud29ybGQudjEuV29ybGRDb250cm9sbGVySABCCQoHcGF5bG9hZCqIAwoRU3Bhd25lclBhY2tldFR5cGUSIwofU1BBV05FUl9QQUNLRVRfVFlQRV9VTlNQRUNJRklFRBAAEi4KJlNQQVdORVJfUEFDS0VUX1RZUEVfU0VTU0lPTl9DT05UUk9MTEVSEAEaAggBEioKJlNQQVdORVJfUEFDS0VUX1RZUEVfQ0hBTk5FTF9DT05UUk9MTEVSEAISHAoYU1BBV05FUl9QQUNLRVRfVFlQRV9URVhUEAMSJAogU1BBV05FUl9QQUNLRVRfVFlQRV9JTlBVVF9GSUxURVIQBBIfChtTUEFXTkVSX1BBQ0tFVF9UWVBFX0VNT1RJT04QBRIhCh1TUEFXTkVSX1BBQ0tFVF9UWVBFX0tOT1dMRURHRRAGEiEKHVNQQVdORVJfUEFDS0VUX1RZUEVfU0VOVElNRU5UEAcSKAokU1BBV05FUl9QQUNLRVRfVFlQRV9QUk9NUFRfSU5KRUNUSU9OEAgSHQoZU1BBV05FUl9QQUNLRVRfVFlQRV9XT1JMRBAJQooBChVjb20uc3Bhd25lci5wYWNrZXQudjFCC1BhY2tldFByb3RvUAGiAgNTUFiqAhFTcGF3bmVyLlBhY2tldC5WMcoCEVNwYXduZXJcUGFja2V0XFYx4gIdU3Bhd25lclxQYWNrZXRcVjFcR1BCTWV0YWRhdGHqAhNTcGF3bmVyOjpQYWNrZXQ6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_spawner_channel_v1_channel, file_spawner_emotion_v1_emotion, file_spawner_error_v1_error, file_spawner_input_filter_v1_input_filter, file_spawner_knowledge_v1_knowledge, file_spawner_prompt_injection_v1_prompt_injection, file_spawner_routing_v1_routing, file_spawner_sentiment_v1_sentiment, file_spawner_session_v1_session, file_spawner_text_v1_text, file_spawner_world_v1_world]);
+  fileDesc("Ch5zcGF3bmVyL3BhY2tldC92MS9wYWNrZXQucHJvdG8SEXNwYXduZXIucGFja2V0LnYxIoUGCg1TcGF3bmVyUGFja2V0Ei0KCXRpbWVzdGFtcBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMgoEdHlwZRgCIAEoDjIkLnNwYXduZXIucGFja2V0LnYxLlNwYXduZXJQYWNrZXRUeXBlEiwKB3JvdXRpbmcYAyABKAsyGy5zcGF3bmVyLnJvdXRpbmcudjEuUm91dGluZxIPCgdzdWNjZXNzGAQgASgIEisKBWVycm9yGAUgASgLMhwuc3Bhd25lci5lcnJvci52MS5FcnJvckV2ZW50EkMKEmNoYW5uZWxfY29udHJvbGxlchgHIAEoCzIlLnNwYXduZXIuY2hhbm5lbC52MS5DaGFubmVsQ29udHJvbGxlckgAEioKBHRleHQYCCABKAsyGi5zcGF3bmVyLnRleHQudjEuVGV4dEV2ZW50SAASQQoMaW5wdXRfZmlsdGVyGAkgASgLMikuc3Bhd25lci5pbnB1dF9maWx0ZXIudjEuSW5wdXRGaWx0ZXJFdmVudEgAEjMKB2Vtb3Rpb24YCiABKAsyIC5zcGF3bmVyLmVtb3Rpb24udjEuRW1vdGlvbkV2ZW50SAASOQoJa25vd2xlZGdlGAsgASgLMiQuc3Bhd25lci5rbm93bGVkZ2UudjEuS25vd2xlZGdlRXZlbnRIABI5CglzZW50aW1lbnQYDCABKAsyJC5zcGF3bmVyLnNlbnRpbWVudC52MS5TZW50aW1lbnRFdmVudEgAEk0KEHByb21wdF9pbmplY3Rpb24YDSABKAsyMS5zcGF3bmVyLnByb21wdF9pbmplY3Rpb24udjEuUHJvbXB0SW5qZWN0aW9uRXZlbnRIABI9ChB3b3JsZF9jb250cm9sbGVyGA4gASgLMiEuc3Bhd25lci53b3JsZC52MS5Xb3JsZENvbnRyb2xsZXJIABItCgVhZ2VudBgPIAEoCzIcLnNwYXduZXIuYWdlbnQudjEuQWdlbnRFdmVudEgAQgkKB3BheWxvYWQqggMKEVNwYXduZXJQYWNrZXRUeXBlEiMKH1NQQVdORVJfUEFDS0VUX1RZUEVfVU5TUEVDSUZJRUQQABIqCiZTUEFXTkVSX1BBQ0tFVF9UWVBFX0NIQU5ORUxfQ09OVFJPTExFUhACEhwKGFNQQVdORVJfUEFDS0VUX1RZUEVfVEVYVBADEiQKIFNQQVdORVJfUEFDS0VUX1RZUEVfSU5QVVRfRklMVEVSEAQSHwobU1BBV05FUl9QQUNLRVRfVFlQRV9FTU9USU9OEAUSIQodU1BBV05FUl9QQUNLRVRfVFlQRV9LTk9XTEVER0UQBhIhCh1TUEFXTkVSX1BBQ0tFVF9UWVBFX1NFTlRJTUVOVBAHEigKJFNQQVdORVJfUEFDS0VUX1RZUEVfUFJPTVBUX0lOSkVDVElPThAIEigKJFNQQVdORVJfUEFDS0VUX1RZUEVfV09STERfQ09OVFJPTExFUhAJEh0KGVNQQVdORVJfUEFDS0VUX1RZUEVfQUdFTlQQCkKKAQoVY29tLnNwYXduZXIucGFja2V0LnYxQgtQYWNrZXRQcm90b1ABogIDU1BYqgIRU3Bhd25lci5QYWNrZXQuVjHKAhFTcGF3bmVyXFBhY2tldFxWMeICHVNwYXduZXJcUGFja2V0XFYxXEdQQk1ldGFkYXRh6gITU3Bhd25lcjo6UGFja2V0OjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_spawner_agent_v1_agent, file_spawner_channel_v1_channel, file_spawner_emotion_v1_emotion, file_spawner_error_v1_error, file_spawner_input_filter_v1_input_filter, file_spawner_knowledge_v1_knowledge, file_spawner_prompt_injection_v1_prompt_injection, file_spawner_routing_v1_routing, file_spawner_sentiment_v1_sentiment, file_spawner_text_v1_text, file_spawner_world_v1_world]);
 
 /**
  * @generated from message spawner.packet.v1.SpawnerPacket
@@ -76,18 +76,11 @@ export type SpawnerPacket = Message<"spawner.packet.v1.SpawnerPacket"> & {
   error?: ErrorEvent;
 
   /**
+   * removed: 6
+   *
    * @generated from oneof spawner.packet.v1.SpawnerPacket.payload
    */
   payload: {
-    /**
-     * Deprecated. Controls session state.
-     *
-     * @generated from field: spawner.session.v1.SessionController session_controller = 6 [deprecated = true];
-     * @deprecated
-     */
-    value: SessionController;
-    case: "sessionController";
-  } | {
     /**
      * Controls channel creation and state.
      *
@@ -151,6 +144,14 @@ export type SpawnerPacket = Message<"spawner.packet.v1.SpawnerPacket"> & {
      */
     value: WorldController;
     case: "worldController";
+  } | {
+    /**
+     * Agent event input/output.
+     *
+     * @generated from field: spawner.agent.v1.AgentEvent agent = 15;
+     */
+    value: AgentEvent;
+    case: "agent";
   } | { case: undefined; value?: undefined };
 };
 
@@ -171,12 +172,8 @@ export enum SpawnerPacketType {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: SPAWNER_PACKET_TYPE_SESSION_CONTROLLER = 1 [deprecated = true];
-   * @deprecated
-   */
-  SESSION_CONTROLLER = 1,
-
-  /**
+   * removed: 1
+   *
    * @generated from enum value: SPAWNER_PACKET_TYPE_CHANNEL_CONTROLLER = 2;
    */
   CHANNEL_CONTROLLER = 2,
@@ -212,9 +209,14 @@ export enum SpawnerPacketType {
   PROMPT_INJECTION = 8,
 
   /**
-   * @generated from enum value: SPAWNER_PACKET_TYPE_WORLD = 9;
+   * @generated from enum value: SPAWNER_PACKET_TYPE_WORLD_CONTROLLER = 9;
    */
-  WORLD = 9,
+  WORLD_CONTROLLER = 9,
+
+  /**
+   * @generated from enum value: SPAWNER_PACKET_TYPE_AGENT = 10;
+   */
+  AGENT = 10,
 }
 
 /**

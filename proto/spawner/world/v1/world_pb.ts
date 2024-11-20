@@ -4,17 +4,13 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
-import type { ObservationEvent } from "../../observation/v1/observation_pb";
-import { file_spawner_observation_v1_observation } from "../../observation/v1/observation_pb";
-import type { PlanEvent } from "../../plan/v1/plan_pb";
-import { file_spawner_plan_v1_plan } from "../../plan/v1/plan_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file spawner/world/v1/world.proto.
  */
 export const file_spawner_world_v1_world: GenFile = /*@__PURE__*/
-  fileDesc("ChxzcGF3bmVyL3dvcmxkL3YxL3dvcmxkLnByb3RvEhBzcGF3bmVyLndvcmxkLnYxIjEKDkFnZW50Q2hhcmFjdGVyEgwKBG5hbWUYASABKAkSEQoJY3VzdG9tX2lkGAIgASgJIkkKFkFnZW50RnVuY3Rpb25QYXJhbWV0ZXISDAoEbmFtZRgBIAEoCRIMCgR0eXBlGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJImwKDUFnZW50RnVuY3Rpb24SDAoEbmFtZRgBIAEoCRITCgtkZXNjcmlwdGlvbhgCIAEoCRI4CgZwYXJhbXMYAyADKAsyKC5zcGF3bmVyLndvcmxkLnYxLkFnZW50RnVuY3Rpb25QYXJhbWV0ZXIiyAEKEkFnZW50Q29uZmlndXJhdGlvbhIKCgJpZBgBIAEoCRIUCgxibHVlcHJpbnRfaWQYAiABKAkSFAoMZGlzcGxheV9uYW1lGAMgASgJEjMKCWNoYXJhY3RlchgEIAEoCzIgLnNwYXduZXIud29ybGQudjEuQWdlbnRDaGFyYWN0ZXISMgoJZnVuY3Rpb25zGAUgAygLMh8uc3Bhd25lci53b3JsZC52MS5BZ2VudEZ1bmN0aW9uEhEKCW9iamVjdGl2ZRgGIAEoCSJaChBDcmVhdGVXb3JsZEV2ZW50EhAKCHdvcmxkX2lkGAEgASgJEjQKBmFnZW50cxgCIAMoCzIkLnNwYXduZXIud29ybGQudjEuQWdlbnRDb25maWd1cmF0aW9uIvQBCg9Xb3JsZENvbnRyb2xsZXISMwoEdHlwZRgBIAEoDjIlLnNwYXduZXIud29ybGQudjEuV29ybGRDb250cm9sbGVyVHlwZRI0CgZjcmVhdGUYAiABKAsyIi5zcGF3bmVyLndvcmxkLnYxLkNyZWF0ZVdvcmxkRXZlbnRIABI/CgtvYnNlcnZhdGlvbhgDIAEoCzIoLnNwYXduZXIub2JzZXJ2YXRpb24udjEuT2JzZXJ2YXRpb25FdmVudEgAEioKBHBsYW4YBCABKAsyGi5zcGF3bmVyLnBsYW4udjEuUGxhbkV2ZW50SABCCQoHcGF5bG9hZCqlAQoTV29ybGRDb250cm9sbGVyVHlwZRIlCiFXT1JMRF9DT05UUk9MTEVSX1RZUEVfVU5TUEVDSUZJRUQQABIgChxXT1JMRF9DT05UUk9MTEVSX1RZUEVfQ1JFQVRFEAESJQohV09STERfQ09OVFJPTExFUl9UWVBFX09CU0VSVkFUSU9OEAISHgoaV09STERfQ09OVFJPTExFUl9UWVBFX1BMQU4QA0KEAQoUY29tLnNwYXduZXIud29ybGQudjFCCldvcmxkUHJvdG9QAaICA1NXWKoCEFNwYXduZXIuV29ybGQuVjHKAhBTcGF3bmVyXFdvcmxkXFYx4gIcU3Bhd25lclxXb3JsZFxWMVxHUEJNZXRhZGF0YeoCElNwYXduZXI6OldvcmxkOjpWMWIGcHJvdG8z", [file_spawner_observation_v1_observation, file_spawner_plan_v1_plan]);
+  fileDesc("ChxzcGF3bmVyL3dvcmxkL3YxL3dvcmxkLnByb3RvEhBzcGF3bmVyLndvcmxkLnYxIjEKDkFnZW50Q2hhcmFjdGVyEgwKBG5hbWUYASABKAkSEQoJY3VzdG9tX2lkGAIgASgJIpQBChJBZ2VudENvbmZpZ3VyYXRpb24SCgoCaWQYASABKAkSFAoMYmx1ZXByaW50X2lkGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIzCgljaGFyYWN0ZXIYBCABKAsyIC5zcGF3bmVyLndvcmxkLnYxLkFnZW50Q2hhcmFjdGVyEhEKCW9iamVjdGl2ZRgFIAEoCSJaChBDcmVhdGVXb3JsZEV2ZW50EhAKCHdvcmxkX2lkGAEgASgJEjQKBmFnZW50cxgCIAMoCzIkLnNwYXduZXIud29ybGQudjEuQWdlbnRDb25maWd1cmF0aW9uIlgKDkxvYWRXb3JsZEV2ZW50EhAKCHdvcmxkX2lkGAEgASgJEjQKBmFnZW50cxgCIAMoCzIkLnNwYXduZXIud29ybGQudjEuQWdlbnRDb25maWd1cmF0aW9uIrkBCg9Xb3JsZENvbnRyb2xsZXISMwoEdHlwZRgBIAEoDjIlLnNwYXduZXIud29ybGQudjEuV29ybGRDb250cm9sbGVyVHlwZRI0CgZjcmVhdGUYAiABKAsyIi5zcGF3bmVyLndvcmxkLnYxLkNyZWF0ZVdvcmxkRXZlbnRIABIwCgRsb2FkGAMgASgLMiAuc3Bhd25lci53b3JsZC52MS5Mb2FkV29ybGRFdmVudEgAQgkKB3BheWxvYWQqfgoTV29ybGRDb250cm9sbGVyVHlwZRIlCiFXT1JMRF9DT05UUk9MTEVSX1RZUEVfVU5TUEVDSUZJRUQQABIgChxXT1JMRF9DT05UUk9MTEVSX1RZUEVfQ1JFQVRFEAESHgoaV09STERfQ09OVFJPTExFUl9UWVBFX0xPQUQQAkKEAQoUY29tLnNwYXduZXIud29ybGQudjFCCldvcmxkUHJvdG9QAaICA1NXWKoCEFNwYXduZXIuV29ybGQuVjHKAhBTcGF3bmVyXFdvcmxkXFYx4gIcU3Bhd25lclxXb3JsZFxWMVxHUEJNZXRhZGF0YeoCElNwYXduZXI6OldvcmxkOjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message spawner.world.v1.AgentCharacter
@@ -40,73 +36,6 @@ export type AgentCharacter = Message<"spawner.world.v1.AgentCharacter"> & {
  */
 export const AgentCharacterSchema: GenMessage<AgentCharacter> = /*@__PURE__*/
   messageDesc(file_spawner_world_v1_world, 0);
-
-/**
- * @generated from message spawner.world.v1.AgentFunctionParameter
- */
-export type AgentFunctionParameter = Message<"spawner.world.v1.AgentFunctionParameter"> & {
-  /**
-   * Indicates the name of the parameter.
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * Indicates the type of value. Python types are preferred, but not strictly
-   * necessary.
-   *
-   * @generated from field: string type = 2;
-   */
-  type: string;
-
-  /**
-   * Description of the parameter.
-   *
-   * @generated from field: string description = 3;
-   */
-  description: string;
-};
-
-/**
- * Describes the message spawner.world.v1.AgentFunctionParameter.
- * Use `create(AgentFunctionParameterSchema)` to create a new message.
- */
-export const AgentFunctionParameterSchema: GenMessage<AgentFunctionParameter> = /*@__PURE__*/
-  messageDesc(file_spawner_world_v1_world, 1);
-
-/**
- * @generated from message spawner.world.v1.AgentFunction
- */
-export type AgentFunction = Message<"spawner.world.v1.AgentFunction"> & {
-  /**
-   * Indicates the name of the function.
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * Describes the function.
-   *
-   * @generated from field: string description = 2;
-   */
-  description: string;
-
-  /**
-   * Indicates the parameters the function accepts.
-   *
-   * @generated from field: repeated spawner.world.v1.AgentFunctionParameter params = 3;
-   */
-  params: AgentFunctionParameter[];
-};
-
-/**
- * Describes the message spawner.world.v1.AgentFunction.
- * Use `create(AgentFunctionSchema)` to create a new message.
- */
-export const AgentFunctionSchema: GenMessage<AgentFunction> = /*@__PURE__*/
-  messageDesc(file_spawner_world_v1_world, 2);
 
 /**
  * @generated from message spawner.world.v1.AgentConfiguration
@@ -146,18 +75,11 @@ export type AgentConfiguration = Message<"spawner.world.v1.AgentConfiguration"> 
   character?: AgentCharacter;
 
   /**
-   * Functions the agent is able to call to achieve objectives. Note that this
-   * is only used if the agent is autonomous.
+   * Describes the current objective of the agent. If an objective is passed
+   * when creating an event, the agent's objective will be initialized with the
+   * value passed.
    *
-   * @generated from field: repeated spawner.world.v1.AgentFunction functions = 5;
-   */
-  functions: AgentFunction[];
-
-  /**
-   * Defines the initial objective of the agent. Note that the objective is
-   * likely to change as the agent reacts to its observations.
-   *
-   * @generated from field: string objective = 6;
+   * @generated from field: string objective = 5;
    */
   objective: string;
 };
@@ -167,7 +89,7 @@ export type AgentConfiguration = Message<"spawner.world.v1.AgentConfiguration"> 
  * Use `create(AgentConfigurationSchema)` to create a new message.
  */
 export const AgentConfigurationSchema: GenMessage<AgentConfiguration> = /*@__PURE__*/
-  messageDesc(file_spawner_world_v1_world, 3);
+  messageDesc(file_spawner_world_v1_world, 1);
 
 /**
  * @generated from message spawner.world.v1.CreateWorldEvent
@@ -191,15 +113,36 @@ export type CreateWorldEvent = Message<"spawner.world.v1.CreateWorldEvent"> & {
  * Use `create(CreateWorldEventSchema)` to create a new message.
  */
 export const CreateWorldEventSchema: GenMessage<CreateWorldEvent> = /*@__PURE__*/
-  messageDesc(file_spawner_world_v1_world, 4);
+  messageDesc(file_spawner_world_v1_world, 2);
+
+/**
+ * @generated from message spawner.world.v1.LoadWorldEvent
+ */
+export type LoadWorldEvent = Message<"spawner.world.v1.LoadWorldEvent"> & {
+  /**
+   * @generated from field: string world_id = 1;
+   */
+  worldId: string;
+
+  /**
+   * Only output. Indicates the current state of agents.
+   *
+   * @generated from field: repeated spawner.world.v1.AgentConfiguration agents = 2;
+   */
+  agents: AgentConfiguration[];
+};
+
+/**
+ * Describes the message spawner.world.v1.LoadWorldEvent.
+ * Use `create(LoadWorldEventSchema)` to create a new message.
+ */
+export const LoadWorldEventSchema: GenMessage<LoadWorldEvent> = /*@__PURE__*/
+  messageDesc(file_spawner_world_v1_world, 3);
 
 /**
  * Message for Spawner Worlds. A world is a high-level entity with the primary
- * role of mananging autonomous agents. Agents are always attached to a
- * character. Generally, character defines the personality, and agent defines
- * the thought and autonomous behavior given a stream of information about its
- * surrounding. At a basic level, agents are able to receive 'observation's and 'plan'
- * accordingly.
+ * role of mananging autonomous/non-autonomous agents. Agents must have a
+ * character attached.
  *
  * @generated from message spawner.world.v1.WorldController
  */
@@ -220,16 +163,10 @@ export type WorldController = Message<"spawner.world.v1.WorldController"> & {
     case: "create";
   } | {
     /**
-     * @generated from field: spawner.observation.v1.ObservationEvent observation = 3;
+     * @generated from field: spawner.world.v1.LoadWorldEvent load = 3;
      */
-    value: ObservationEvent;
-    case: "observation";
-  } | {
-    /**
-     * @generated from field: spawner.plan.v1.PlanEvent plan = 4;
-     */
-    value: PlanEvent;
-    case: "plan";
+    value: LoadWorldEvent;
+    case: "load";
   } | { case: undefined; value?: undefined };
 };
 
@@ -238,7 +175,7 @@ export type WorldController = Message<"spawner.world.v1.WorldController"> & {
  * Use `create(WorldControllerSchema)` to create a new message.
  */
 export const WorldControllerSchema: GenMessage<WorldController> = /*@__PURE__*/
-  messageDesc(file_spawner_world_v1_world, 5);
+  messageDesc(file_spawner_world_v1_world, 4);
 
 /**
  * @generated from enum spawner.world.v1.WorldControllerType
@@ -257,18 +194,11 @@ export enum WorldControllerType {
   CREATE = 1,
 
   /**
-   * Adds agent observation.
+   * Loads an existing world.
    *
-   * @generated from enum value: WORLD_CONTROLLER_TYPE_OBSERVATION = 2;
+   * @generated from enum value: WORLD_CONTROLLER_TYPE_LOAD = 2;
    */
-  OBSERVATION = 2,
-
-  /**
-   * Construct a plan of tasks.
-   *
-   * @generated from enum value: WORLD_CONTROLLER_TYPE_PLAN = 3;
-   */
-  PLAN = 3,
+  LOAD = 2,
 }
 
 /**
