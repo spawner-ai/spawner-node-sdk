@@ -1,4 +1,4 @@
-import { type CallOptions, type PromiseClient, createPromiseClient } from "@connectrpc/connect";
+import { type CallOptions, type Client, createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { type WritableIterable, createWritableIterable } from "@connectrpc/connect/protocol";
 import { create } from "@bufbuild/protobuf";
@@ -60,7 +60,7 @@ interface LoadWorldProps {
 
 export class SpawnerMainService {
 	private config: ConnectionConfig;
-	private client: PromiseClient<MainServiceType>;
+	private client: Client<MainServiceType>;
 
 	constructor(props: ServiceProps) {
 		this.config = props.config;
@@ -70,10 +70,9 @@ export class SpawnerMainService {
 
 	private createClient() {
 		const { hostname, ssl } = this.config.gateway!;
-		const client = createPromiseClient(
+		const client = createClient(
 			MainService,
 			createGrpcTransport({
-				httpVersion: "2",
 				baseUrl: `${ssl ? `https` : `http`}://${hostname}`,
 			}),
 		);
