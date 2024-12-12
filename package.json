@@ -7,9 +7,9 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc --build",
-    "lint:check": "npx @biomejs/biome lint ./src",
-    "lint:fix": "npx @biomejs/biome lint --write ./src",
-    "lint:fix:force": "npx @biomejs/biome lint --write --unsafe ./src",
+    "watch": "npx tsc --watch",
+    "lint:check": "npx eslint .",
+    "lint:fix": "npx eslint . --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,6 +27,8 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@stylistic/eslint-plugin": "^2.12.1",
+    "eslint": "^9.16.0",
+    "typescript-eslint": "^8.18.0"
   }
 }
