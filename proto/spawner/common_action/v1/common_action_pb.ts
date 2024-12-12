@@ -2,8 +2,8 @@
 // @generated from file spawner/common_action/v1/common_action.proto (package spawner.common_action.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { FieldOfView } from "../../field_of_view/v1/field_of_view_pb";
 import { file_spawner_field_of_view_v1_field_of_view } from "../../field_of_view/v1/field_of_view_pb";
 import type { Partition } from "../../partition/v1/partition_pb";
@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file spawner/common_action/v1/common_action.proto.
  */
 export const file_spawner_common_action_v1_common_action: GenFile = /*@__PURE__*/
-  fileDesc("CixzcGF3bmVyL2NvbW1vbl9hY3Rpb24vdjEvY29tbW9uX2FjdGlvbi5wcm90bxIYc3Bhd25lci5jb21tb25fYWN0aW9uLnYxIjoKHENvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb25BcmcSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJInUKGUNvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb24SEAoIZnVuY3Rpb24YASABKAkSRgoGa3dhcmdzGAIgAygLMjYuc3Bhd25lci5jb21tb25fYWN0aW9uLnYxLkNvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb25BcmcizQEKEUNvbW1vbkFjdGlvbkV2ZW50EjIKCXBhcnRpdGlvbhgBIAEoCzIfLnNwYXduZXIucGFydGl0aW9uLnYxLlBhcnRpdGlvbhI8Cg1maWVsZF9vZl92aWV3GAIgASgLMiUuc3Bhd25lci5maWVsZF9vZl92aWV3LnYxLkZpZWxkT2ZWaWV3EkYKCWZ1bmN0aW9ucxgDIAMoCzIzLnNwYXduZXIuY29tbW9uX2FjdGlvbi52MS5Db21tb25BY3Rpb25FdmVudEZ1bmN0aW9uQq8BChxjb20uc3Bhd25lci5jb21tb25fYWN0aW9uLnYxQhFDb21tb25BY3Rpb25Qcm90b1ABogIDU0NYqgIXU3Bhd25lci5Db21tb25BY3Rpb24uVjHKAhdTcGF3bmVyXENvbW1vbkFjdGlvblxWMeICI1NwYXduZXJcQ29tbW9uQWN0aW9uXFYxXEdQQk1ldGFkYXRh6gIZU3Bhd25lcjo6Q29tbW9uQWN0aW9uOjpWMWIGcHJvdG8z", [file_spawner_field_of_view_v1_field_of_view, file_spawner_partition_v1_partition]);
+  fileDesc("CixzcGF3bmVyL2NvbW1vbl9hY3Rpb24vdjEvY29tbW9uX2FjdGlvbi5wcm90bxIYc3Bhd25lci5jb21tb25fYWN0aW9uLnYxIjoKHENvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb25BcmcSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJInUKGUNvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb24SEAoIZnVuY3Rpb24YASABKAkSRgoGa3dhcmdzGAIgAygLMjYuc3Bhd25lci5jb21tb25fYWN0aW9uLnYxLkNvbW1vbkFjdGlvbkV2ZW50RnVuY3Rpb25BcmcijAIKEUNvbW1vbkFjdGlvbkV2ZW50Ej0KBHR5cGUYASABKA4yLy5zcGF3bmVyLmNvbW1vbl9hY3Rpb24udjEuQ29tbW9uQWN0aW9uRXZlbnRUeXBlEjIKCXBhcnRpdGlvbhgCIAEoCzIfLnNwYXduZXIucGFydGl0aW9uLnYxLlBhcnRpdGlvbhI8Cg1maWVsZF9vZl92aWV3GAMgASgLMiUuc3Bhd25lci5maWVsZF9vZl92aWV3LnYxLkZpZWxkT2ZWaWV3EkYKCWZ1bmN0aW9ucxgEIAMoCzIzLnNwYXduZXIuY29tbW9uX2FjdGlvbi52MS5Db21tb25BY3Rpb25FdmVudEZ1bmN0aW9uKmYKFUNvbW1vbkFjdGlvbkV2ZW50VHlwZRIoCiRDT01NT05fQUNUSU9OX0VWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIjCh9DT01NT05fQUNUSU9OX0VWRU5UX1RZUEVfSU5WT0tFEAFCrwEKHGNvbS5zcGF3bmVyLmNvbW1vbl9hY3Rpb24udjFCEUNvbW1vbkFjdGlvblByb3RvUAGiAgNTQ1iqAhdTcGF3bmVyLkNvbW1vbkFjdGlvbi5WMcoCF1NwYXduZXJcQ29tbW9uQWN0aW9uXFYx4gIjU3Bhd25lclxDb21tb25BY3Rpb25cVjFcR1BCTWV0YWRhdGHqAhlTcGF3bmVyOjpDb21tb25BY3Rpb246OlYxYgZwcm90bzM", [file_spawner_field_of_view_v1_field_of_view, file_spawner_partition_v1_partition]);
 
 /**
  * @generated from message spawner.common_action.v1.CommonActionEventFunctionArg
@@ -70,9 +70,14 @@ export const CommonActionEventFunctionSchema: GenMessage<CommonActionEventFuncti
  */
 export type CommonActionEvent = Message<"spawner.common_action.v1.CommonActionEvent"> & {
   /**
+   * @generated from field: spawner.common_action.v1.CommonActionEventType type = 1;
+   */
+  type: CommonActionEventType;
+
+  /**
    * Only input. Required field.
    *
-   * @generated from field: spawner.partition.v1.Partition partition = 1;
+   * @generated from field: spawner.partition.v1.Partition partition = 2;
    */
   partition?: Partition;
 
@@ -80,14 +85,14 @@ export type CommonActionEvent = Message<"spawner.common_action.v1.CommonActionEv
    * Only input. The current field-of-view of the agent. Unlike world
    * partitions, the field-of-view defines local attributes.
    *
-   * @generated from field: spawner.field_of_view.v1.FieldOfView field_of_view = 2;
+   * @generated from field: spawner.field_of_view.v1.FieldOfView field_of_view = 3;
    */
   fieldOfView?: FieldOfView;
 
   /**
    * Output only.
    *
-   * @generated from field: repeated spawner.common_action.v1.CommonActionEventFunction functions = 3;
+   * @generated from field: repeated spawner.common_action.v1.CommonActionEventFunction functions = 4;
    */
   functions: CommonActionEventFunction[];
 };
@@ -98,4 +103,27 @@ export type CommonActionEvent = Message<"spawner.common_action.v1.CommonActionEv
  */
 export const CommonActionEventSchema: GenMessage<CommonActionEvent> = /*@__PURE__*/
   messageDesc(file_spawner_common_action_v1_common_action, 2);
+
+/**
+ * @generated from enum spawner.common_action.v1.CommonActionEventType
+ */
+export enum CommonActionEventType {
+  /**
+   * @generated from enum value: COMMON_ACTION_EVENT_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * An invoke event should be called to plan a common action.
+   *
+   * @generated from enum value: COMMON_ACTION_EVENT_TYPE_INVOKE = 1;
+   */
+  INVOKE = 1,
+}
+
+/**
+ * Describes the enum spawner.common_action.v1.CommonActionEventType.
+ */
+export const CommonActionEventTypeSchema: GenEnum<CommonActionEventType> = /*@__PURE__*/
+  enumDesc(file_spawner_common_action_v1_common_action, 0);
 
