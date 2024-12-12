@@ -4,7 +4,7 @@ type AgeGroup = 'NONE' | 'CHILD' | 'TEEN' | 'ADULT' | 'ELDERLY'
 type Gender = 'NONE' | 'MALE' | 'FEMALE'
 export interface PlayerProps {
   id: string
-  display_name: string
+  display_name?: string
   age_group?: AgeGroup
   gender?: Gender
   description?: string
@@ -12,7 +12,7 @@ export interface PlayerProps {
 
 export class Player {
   readonly id: string
-  readonly display_name: string
+  readonly display_name?: string
   readonly age_group?: string
   readonly gender?: string
   readonly description?: string

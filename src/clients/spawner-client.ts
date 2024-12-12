@@ -47,6 +47,7 @@ export class SpawnerClient {
       config,
       apiKey: this.apiKey!,
       workspaceId: this.workspaceId!,
+      player: this.player,
     })
 
     const token = await service.generateSessionToken()
@@ -147,7 +148,10 @@ export class SpawnerClient {
       throw Error('Api key is required')
     }
     if (!this.workspaceId) {
-      throw Error('Workspace ID is required')
+      throw Error('Workspace id is required')
+    }
+    if (!this.player || !this.player.id) {
+      throw Error('Player id is required.')
     }
   }
 }
