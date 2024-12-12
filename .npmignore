@@ -1,3 +1,22 @@
-/node_modules
-/src
+# development
+.git
+.gitignore
+.npmignore
+eslint.config.mjs
 tsconfig.json
+node_modules/
+tsconfig.json
+
+# src
+/src/
+!dist/src/
+
+# proto 
+/proto/
+!dist/proto/
+
+# local
+*.log
+
+# Mac
+**/.DS_Store
