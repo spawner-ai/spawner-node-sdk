@@ -85,7 +85,7 @@ export class SpawnerMainService {
 		const connection = createWritableIterable<ProtoPacket>();
 		const options = this.getOptions(sessionToken);
 		const responses = this.client.connectSession(connection, options);
-
+    
 		const processResponses = async () => {
 			try {
 				for await (const res of responses) {

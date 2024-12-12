@@ -218,10 +218,26 @@ export class ConnectionService {
 				case: "text",
 				value: textEvent,
 			}
-    }) 
+    })
 
-		await this.stream.write(packet);
+    this.write(packet);
 	}
+
+  private async write(packet: ProtoPacket) {
+    if (this.isActive()) {
+      this.stream.write(packet);
+    } else {
+      // inactive code
+    }
+    
+    this.open(this.world);
+  }
+
+  private scheduleDisconnect() {
+    if(this.connectionProps.config.autoConnect?.disconnectTimeout){
+      // TODO:schedule disconnect time
+    }
+  }
 
 	async generateSessionToken() {
 		const { feature } = this.connectionProps.config
