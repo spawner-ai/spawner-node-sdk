@@ -43,14 +43,12 @@ export class SessionToken {
   }
 
   static convertProto(proto: GenerateSessionTokenResponse) {
-    const data = create(TimestampSchema, proto.expireTime)
-    data.nanos
-    data.seconds
+    const timestamp = create(TimestampSchema, proto.expireTime)
     return new SessionToken({
       sessionId: proto.sessionId,
       token: proto.token,
       tokenType: proto.tokenType,
-      expireTime: this.timestampToDate(create(TimestampSchema, proto.expireTime)),
+      expireTime: this.timestampToDate(timestamp),
     })
   }
 }

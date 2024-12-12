@@ -6,7 +6,7 @@ import { create } from '@bufbuild/protobuf'
 import { GenerateSessionTokenRequestSchema, MainService } from '../../proto/spawner/main/v1/main_pb'
 import { MainServiceType } from '../common/types'
 import { type FeatureConfiguration } from '../../proto/spawner/main/v1/main_pb'
-import { SpawnerPacketSchema, SpawnerPacket as ProtoPacket, SpawnerPacketType, SpawnerPacketTypeSchema } from '../../proto/spawner/packet/v1/packet_pb'
+import { SpawnerPacketSchema, SpawnerPacket as ProtoPacket, SpawnerPacketType } from '../../proto/spawner/packet/v1/packet_pb'
 import type { ConnectionConfig } from '../common/types'
 import { ActorSchema, AgentActorSchema, PlayerActorSchema } from '../../proto/spawner/actor/v1/actor_pb'
 import {
@@ -80,7 +80,7 @@ export class SpawnerMainService {
   }
 
   async openSession(props: OpenSessionProps): Promise<WritableIterable<ProtoPacket>> {
-    const { sessionToken, onMessage, onError, onClose } = props
+    const { sessionToken, onMessage, onError } = props
 
     const connection = createWritableIterable<ProtoPacket>()
     const options = this.getOptions(sessionToken)

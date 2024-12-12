@@ -101,8 +101,6 @@ export class ConnectionService {
       this.connectionProps.sessionAccessor?.set(this.sessionToken)
     }
 
-    let stream: WritableIterable<ProtoPacket>
-
     if (!world) {
       if (!this.connectionProps.characters) {
         throw Error('The character to be given to the world is empty or undefined.')
@@ -121,7 +119,7 @@ export class ConnectionService {
       this.world = loadWorld
     }
 
-    stream = await this.mainService.openSession({
+    const stream = await this.mainService.openSession({
       sessionToken: this.sessionToken,
       onMessage: this.onMessage,
       onError: this.onError,
